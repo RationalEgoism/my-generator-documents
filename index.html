@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SA Document Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .tab {
+            padding: 15px 30px;
+            background: #f5f5f5;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 10px 10px 0 0;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            background: #e0e0e0;
+        }
+
+        .tab.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .form-content {
+            display: none;
+        }
+
+        .form-content.active {
+            display: block;
+        }
+
+        .form-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        input, select, textarea {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border 0.3s;
+            font-family: Arial, sans-serif;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .photo-upload {
+            grid-column: 1 / -1;
+            text-align: center;
+        }
+
+        .photo-upload input {
+            display: none;
+        }
+
+        .upload-btn {
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+            display: inline-block;
+        }
+
+        .upload-btn:hover {
+            background: #5568d3;
+        }
+
+        .generate-btn {
+            width: 100%;
+            background: #28a745;
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .generate-btn:hover {
+            background: #218838;
+        }
+
+        .preview-photo {
+            margin-top: 10px;
+            max-width: 150px;
+            max-height: 150px;
+            display: none;
+            border-radius: 5px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .document-container {
+            margin-top: 40px;
+            display: none;
+        }
+
+        /* ID CARD STYLES */
+        .id-card {
+            width: 856px;
+            height: 540px;
+            background: linear-gradient(135deg, #00a651 0%, #007a3d 100%);
+            border-radius: 15px;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            overflow: hidden;
+            margin: 0 auto;
+        }
+
+        .id-card-header {
+            background: rgba(255,255,255,0.95);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #007a3d;
+        }
+
+        .coat-of-arms {
+            width: 80px;
+            height: 80px;
+            background: #007a3d;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 10px;
+            text-align: center;
+            padding: 5px;
+        }
+
+        .header-text {
+            flex: 1;
+            text-align: center;
+        }
+
+        .header-text h2 {
+            color: #007a3d;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .header-text p {
+            color: #555;
+            font-size: 14px;
+        }
+
+        .id-card-body {
+            padding: 30px;
+            display: flex;
+            gap: 30px;
+        }
+
+        .photo-section {
+            width: 180px;
+        }
+
+        .id-photo {
+            width: 180px;
+            height: 240px;
+            background: white;
+            border: 3px solid white;
+            border-radius: 5px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .id-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .info-section {
+            flex: 1;
+            color: white;
+        }
+
+        .info-row {
+            margin-bottom: 20px;
+        }
+
+        .info-label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 3px;
+        }
+
+        .info-value {
+            font-size: 18px;
+            font-weight: bold;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 12px;
+            border-radius: 5px;
+        }
+
+        .id-number {
+            font-size: 24px;
+            letter-spacing: 2px;
+        }
+
+        .id-card-footer {
+            position: absolute;
+            bottom: 20px;
+            left: 30px;
+            right: 30px;
+            display: flex;
+            justify-content: space-between;
+            color: white;
+            font-size: 12px;
+        }
+
+        /* PASSPORT STYLES */
+        .passport {
+            width: 600px;
+            height: 850px;
+            background: linear-gradient(135deg, #003d82 0%, #002050 100%);
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        .passport-cover {
+            padding: 40px;
+            text-align: center;
+            color: gold;
+        }
+
+        .passport-coat {
+            width: 150px;
+            height: 150px;
+            background: gold;
+            border-radius: 50%;
+            margin: 0 auto 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #003d82;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .passport-title {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+
+        .passport-subtitle {
+            font-size: 20px;
+            margin-bottom: 40px;
+        }
+
+        .passport-type {
+            font-size: 28px;
+            font-weight: bold;
+            letter-spacing: 4px;
+        }
+
+        .passport-data-page {
+            background: rgba(255,255,255,0.98);
+            margin: 30px;
+            padding: 30px;
+            border-radius: 10px;
+        }
+
+        .passport-header-section {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #003d82;
+        }
+
+        .passport-header-section h3 {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .passport-content {
+            display: flex;
+            gap: 20px;
+        }
+
+        .passport-photo-section {
+            width: 180px;
+        }
+
+        .passport-photo {
+            width: 180px;
+            height: 240px;
+            background: #f0f0f0;
+            border: 2px solid #003d82;
+            overflow: hidden;
+        }
+
+        .passport-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .passport-info {
+            flex: 1;
+        }
+
+        .passport-field {
+            margin-bottom: 15px;
+        }
+
+        .passport-field-label {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 2px;
+        }
+
+        .passport-field-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #000;
+            padding: 5px 0;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .passport-number {
+            font-size: 20px;
+            letter-spacing: 2px;
+        }
+
+        .mrz-section {
+            background: #f5f5f5;
+            padding: 15px;
+            margin-top: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            letter-spacing: 1px;
+            border-radius: 5px;
+        }
+
+        /* ASYLUM PAPER STYLES */
+        .asylum-paper {
+            width: 800px;
+            background: white;
+            margin: 0 auto;
+            padding: 50px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            border: 2px solid #003d82;
+        }
+
+        .asylum-header {
+            text-align: center;
+            border-bottom: 3px solid #003d82;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .asylum-logo {
+            width: 120px;
+            height: 120px;
+            background: #003d82;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .asylum-header h2 {
+            color: #003d82;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .asylum-header h3 {
+            color: #666;
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .asylum-ref {
+            text-align: center;
+            background: #f0f0f0;
+            padding: 15px;
+            margin: 20px 0;
+            border-left: 5px solid #003d82;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .asylum-content {
+            display: flex;
+            gap: 30px;
+        }
+
+        .asylum-photo-section {
+            width: 200px;
+        }
+
+        .asylum-photo {
+            width: 200px;
+            height: 260px;
+            background: #f0f0f0;
+            border: 3px solid #003d82;
+            overflow: hidden;
+        }
+
+        .asylum-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .asylum-info {
+            flex: 1;
+        }
+
+        .asylum-section {
+            margin-bottom: 25px;
+        }
+
+        .asylum-section h4 {
+            color: #003d82;
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .asylum-field {
+            margin-bottom: 15px;
+        }
+
+        .asylum-field-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 3px;
+        }
+
+        .asylum-field-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #000;
+            padding: 8px 10px;
+            background: #f9f9f9;
+            border-left: 3px solid #003d82;
+        }
+
+        .asylum-footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #003d82;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .asylum-signature {
+            text-align: center;
+        }
+
+        .asylum-signature-line {
+            width: 200px;
+            border-bottom: 2px solid #000;
+            margin-bottom: 5px;
+        }
+
+        .asylum-notice {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+
+        .asylum-notice h4 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .asylum-notice p {
+            color: #856404;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 900px) {
+            .id-card, .passport, .asylum-paper {
+                transform: scale(0.8);
+                transform-origin: top center;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .id-card, .passport, .asylum-paper {
+                transform: scale(0.6);
+            }
+        }
+
+        @media (max-width: 550px) {
+            .id-card, .passport, .asylum-paper {
+                transform: scale(0.45);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🇿🇦 South African Document Generator</h1>
+        
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('id')">ID Card</button>
+            <button class="tab" onclick="switchTab('passport')">Passport</button>
+            <button class="tab" onclick="switchTab('asylum')">Asylum Paper</button>
+        </div>
+
+        <!-- ID CARD FORM -->
+        <div id="id-form" class="form-content active">
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="id_idNumber">ID Number</label>
+                    <input type="text" id="id_idNumber" placeholder="8001015009087" maxlength="13">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_surname">Surname</label>
+                    <input type="text" id="id_surname" placeholder="MANDELA">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_names">Names</label>
+                    <input type="text" id="id_names" placeholder="NELSON ROLIHLAHLA">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_sex">Sex</label>
+                    <select id="id_sex">
+                        <option value="M">Male</option>
+                        <option value="F">Female</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_dateOfBirth">Date of Birth</label>
+                    <input type="date" id="id_dateOfBirth">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_nationality">Nationality</label>
+                    <input type="text" id="id_nationality" value="RSA" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_countryOfBirth">Country of Birth</label>
+                    <input type="text" id="id_countryOfBirth" value="RSA">
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_status">Status</label>
+                    <select id="id_status">
+                        <option value="Citizen">Citizen</option>
+                        <option value="Permanent Resident">Permanent Resident</option>
+                    </select>
+                </div>
+                
+                <div class="photo-upload">
+                    <label for="id_photo" class="upload-btn">📷 Upload Photo</label>
+                    <input type="file" id="id_photo" accept="image/*">
+                    <img id="id_preview" class="preview-photo" alt="Preview">
+                </div>
+            </div>
+            
+            <button class="generate-btn" onclick="generateIDCard()">Generate ID Card</button>
+        </div>
+
+        <!-- PASSPORT FORM -->
+        <div id="passport-form" class="form-content">
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="pp_number">Passport Number</label>
+                    <input type="text" id="pp_number" placeholder="A00000000" maxlength="9">
+                </div>
+                
+                <div class="form-group">
+                    <label for="pp_surname">Surname</label>
+                    <input type="text" id="pp_surname" placeholder="MANDELA">
+                </div>
+                
+                <div class="form-group">
+                    <label for="pp_names">Given Names</label>
+                    <input type="text" id="pp_names" placeholder="NELSON ROLIHLAHLA">
+                </div>
+                
+                <div class="form-group">
+                    <label for="pp_nationality">Nationality</label>
+                    <input type="text" id="pp_nationality" value="SOUTH AFRICAN">
+                </div>
+                
+                <div class="form-group">
+                    <label for="pp_dob">Date of Birth</label>
+                    <input type="date" id="pp_dob">
+                </div>
+                
+                <div class="form-group">
+                    <label for="pp_pob">Place of Birth</label>
+                    <input type="text" id="pp_pob" placeholder="MVEZO, EASTERN CAPE">
+                </div>
+                
+                <div class="form-group">
+                    <label for="pp_sex">Sex</label>
+                    <select id="pp_sex">
+                        <option value="M">M</option>
+                        <option value="F">F</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="pp_issue">Date of Issue</label>
+                    <input type="date" id="pp_issue">
+                </div>
+                
+                <div class="form-group">
+                    <label for="pp_expiry">Date of Expiry</label>
+                    <input type="date" id="pp_expiry">
+                </div>
+                
+                <div class="form-group">
+                    <label for="pp_authority">Issuing Authority</label>
+                    <input type="text" id="pp_authority" value="DEPT OF HOME AFFAIRS">
+                </div>
+                
+                <div class="photo-upload">
+                    <label for="pp_photo" class="upload-btn">📷 Upload Photo</label>
+                    <input type="file" id="pp_photo" accept="image/*">
+                    <img id="pp_preview" class="preview-photo" alt="Preview">
+                </div>
+            </div>
+            
+            <button class="generate-btn" onclick="generatePassport()">Generate Passport</button>
+        </div>
+
+        <!-- ASYLUM PAPER FORM -->
+        <div id="asylum-form" class="form-content">
+            <div class="form-section">
+                <div class="form-group">
+                    <label for="as_refNumber">Reference Number</label>
+                    <input type="text" id="as_refNumber" placeholder="ASY/2024/00000">
+                </div>
+                
+                <div class="form-group">
+                    <label for="as_surname">Surname</label>
+                    <input type="text" id="as_surname" placeholder="SURNAME">
+                </div>
+                
+                <div class="form-group">
+                    <label for="as_names">Full Names</label>
+                    <input type="text" id="as_names" placeholder="FULL NAMES">
+                </div>
+                
+                <div class="form-group">
+                    <label for="as_nationality">Nationality</label>
+                    <input type="text" id="as_nationality" placeholder="NATIONALITY">
+                </div>
+                
+                <div class="form-group">
+                    <label for="as_dob">Date of Birth</label>
+                    <input type="date" id="as_dob">
+                </div>
+                
+                <div class="form-group">
+                    <label for="as_pob">Place of Birth</label>
+                    <input type="text" id="as_pob" placeholder="PLACE OF BIRTH">
+                </div>
+                
+                <div class="form-group">
+                    <label for="as_sex">Sex</label>
+                    <select id="as_sex">
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="as_passportNo">Passport Number (if any)</label>
+                    <input type="text" id="as_passportNo" placeholder="Optional">
+                </div>
+                
+                <div class="form-group">
+                    <label for="as_dateOfArrival">Date of Arrival in SA</label>
+                    <input type="date" id="as_dateOfArrival">
+                </div>
+                
+                <div class="form-group">
+                    <label for="as_portOfEntry">Port of Entry</label>
+                    <input type="text" id="as_portOfEntry" placeholder="e.g., OR Tambo International">
+                </div>
+                
+                <div class="form-group">
+                    <label for="as_address">Current Address in SA</label>
+                    <textarea id="as_address" placeholder="Full address"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="as_issueDate">Date of Issue</label>
+                    <input type="date" id="as_issueDate">
+                </div>
+                
+                <div class="form-group">
+                    <label for="as_validUntil">Valid Until</label>
+                    <input type="date" id="as_validUntil">
+                </div>
+                
+                <div class="photo-upload">
+                    <label for="as_photo" class="upload-btn">📷 Upload Photo</label>
+                    <input type="file" id="as_photo" accept="image/*">
+                    <img id="as_preview" class="preview-photo" alt="Preview">
+                </div>
+            </div>
+            
+            <button class="generate-btn" onclick="generateAsylum()">Generate Asylum Paper</button>
+        </div>
+
+        <!-- ID CARD OUTPUT -->
+        <div id="id-output" class="document-container">
+            <div class="id-card">
+                <div class="id-card-header">
+                    <div class="coat-of-arms">SA Coat of Arms</div>
+                    <div class="header-text">
+                        <h2>REPUBLIC OF SOUTH AFRICA</h2>
+                        <p>IDENTITY DOCUMENT / IDENTITEITSDOKUMENT</p>
+                    </div>
+                    <div class="coat-of-arms"></div>
+                </div>
+                
+                <div class="id-card-body">
+                    <div class="photo-section">
+                        <div class="id-photo">
+                            <img id="id_cardPhoto" src="" alt="ID Photo">
+                        </div>
+                    </div>
+                    
+                    <div class="info-section">
+                        <div class="info-row">
+                            <div class="info-label">IDENTITY NUMBER / IDENTITEITSNOMMER</div>
+                            <div class="info-value id-number" id="id_cardIdNumber">-</div>
+                        </div>
+                        
+                        <div class="info-row">
+                            <div class="info-label">SURNAME / VAN</div>
+                            <div class="info-value" id="id_cardSurname">-</div>
+                        </div>
+                        
+                        <div class="info-row">
+                            <div class="info-label">NAMES / NAME</div>
+                            <div class="info-value" id="id_cardNames">-</div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 20px;">
+                            <div class="info-row" style="flex: 1;">
+                                <div class="info-label">SEX / GESLAG</div>
+                                <div class="info-value" id="id_cardSex">-</div>
+                            </div>
+                            
+                            <div class="info-row" style="flex: 1;">
+                                <div class="info-label">DATE OF BIRTH / GEBOORTEDATUM</div>
+                                <div class="info-value" id="id_cardDob">-</div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 20px;">
+                            <div class="info-row" style="flex: 1;">
+                                <div class="info-label">COUNTRY OF BIRTH / GEBOORTELAND</div>
+                                <div class="info-value" id="id_cardCountry">-</div>
+                            </div>
+                            
+                            <div class="info-row" style="flex: 1;">
+                                <div class="info-label">STATUS</div>
+                                <div class="info-value" id="id_cardStatus">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="id-card-footer">
+                    <span>NATIONALITY: <strong id="id_cardNationality">RSA</strong></span>
+                    <span>ISSUED: <strong id="id_issueDate">-</strong></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- PASSPORT OUTPUT -->
+        <div id="passport-output" class="document-container">
+            <div class="passport">
+                <div class="passport-cover">
+                    <div class="passport-coat">SA Coat of Arms</div>
+                    <div class="passport-title">SOUTH AFRICA</div>
+                    <div class="passport-subtitle">SUID-AFRIKA</div>
+                    <div class="passport-type">PASSPORT</div>
+                </div>
+                
+                <div class="passport-data-page">
+                    <div class="passport-header-section">
+                        <h3>REPUBLIC OF SOUTH AFRICA</h3>
+                        <p>PASSPORT / PASPOORT</p>
+                    </div>
+                    
+                    <div class="passport-content">
+                        <div class="passport-photo-section">
+                            <div class="passport-photo">
+                                <img id="pp_cardPhoto" src="" alt="Passport Photo">
+                            </div>
+                        </div>
+                        
+                        <div class="passport-info">
+                            <div class="passport-field">
+                                <div class="passport-field-label">Type / Tipe</div>
+                                <div class="passport-field-value">P</div>
+                            </div>
+                            
+                            <div class="passport-field">
+                                <div class="passport-field-label">Passport No. / Paspoort Nr.</div>
+                                <div class="passport-field-value passport-number" id="pp_cardNumber">-</div>
+                            </div>
+                            
+                            <div class="passport-field">
+                                <div class="passport-field-label">Surname / Van</div>
+                                <div class="passport-field-value" id="pp_cardSurname">-</div>
+                            </div>
+                            
+                            <div class="passport-field">
+                                <div class="passport-field-label">Given Names / Voornaine</div>
+                                <div class="passport-field-value" id="pp_cardNames">-</div>
+                            </div>
+                            
+                            <div class="passport-field">
+                                <div class="passport-field-label">Nationality / Nasionaliteit</div>
+                                <div class="passport-field-value" id="pp_cardNationality">-</div>
+                            </div>
+                            
+                            <div style="display: flex; gap: 15px;">
+                                <div class="passport-field" style="flex: 1;">
+                                    <div class="passport-field-label">Date of Birth / Geboortedatum</div>
+                                    <div class="passport-field-value" id="pp_cardDob">-</div>
+                                </div>
+                                
+                                <div class="passport-field" style="flex: 1;">
+                                    <div class="passport-field-label">Sex / Geslag</div>
+                                    <div class="passport-field-value" id="pp_cardSex">-</div>
+                                </div>
+                            </div>
+                            
+                            <div class="passport-field">
+                                <div class="passport-field-label">Place of Birth / Geboorteplek</div>
+                                <div class="passport-field-value" id="pp_cardPob">-</div>
+                            </div>
+                            
+                            <div style="display: flex; gap: 15px;">
+                                <div class="passport-field" style="flex: 1;">
+                                    <div class="passport-field-label">Date of Issue / Datum van Uitreiking</div>
+                                    <div class="passport-field-value" id="pp_cardIssue">-</div>
+                                </div>
+                                
+                                <div class="passport-field" style="flex: 1;">
+                                    <div class="passport-field-label">Date of Expiry / Vervaldatum</div>
+                                    <div class="passport-field-value" id="pp_cardExpiry">-</div>
+                                </div>
+                            </div>
+                            
+                            <div class="passport-field">
+                                <div class="passport-field-label">Authority / Gesag</div>
+                                <div class="passport-field-value" id="pp_cardAuthority">-</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mrz-section" id="pp_mrz">
+                        P&lt;ZAFMANDELA&lt;&lt;NELSON&lt;ROLIHLAHLA&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;<br>
+                        A000000000ZAF8001015M2512315&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;00
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ASYLUM PAPER OUTPUT -->
+        <div id="asylum-output" class="document-container">
+            <div class="asylum-paper">
+                <div class="asylum-header">
+                    <div class="asylum-logo">REPUBLIC OF SOUTH AFRICA</div>
+                    <h2>DEPARTMENT OF HOME AFFAIRS</h2>
+                    <h3>ASYLUM SEEKER PERMIT</h3>
+                    <p>Section 22 - Refugees Act, 1998 (Act No. 130 of 1998)</p>
+                </div>
+                
+                <div class="asylum-ref">
+                    Reference Number: <span id="as_cardRef">-</span>
+                </div>
+                
+                <div class="asylum-content">
+                    <div class="asylum-photo-section">
+                        <div class="asylum-photo">
+                            <img id="as_cardPhoto" src="" alt="Asylum Photo">
+                        </div>
+                    </div>
+                    
+                    <div class="asylum-info">
+                        <div class="asylum-section">
+                            <h4>Personal Information</h4>
+                            
+                            <div class="asylum-field">
+                                <div class="asylum-field-label">Surname</div>
+                                <div class="asylum-field-value" id="as_cardSurname">-</div>
+                            </div>
+                            
+                            <div class="asylum-field">
+                                <div class="asylum-field-label">Full Names</div>
+                                <div class="asylum-field-value" id="as_cardNames">-</div>
+                            </div>
+                            
+                            <div class="asylum-field">
+                                <div class="asylum-field-label">Date of Birth</div>
+                                <div class="asylum-field-value" id="as_cardDob">-</div>
+                            </div>
+                            
+                            <div class="asylum-field">
+                                <div class="asylum-field-label">Place of Birth</div>
+                                <div class="asylum-field-value" id="as_cardPob">-</div>
+                            </div>
+                            
+                            <div class="asylum-field">
+                                <div class="asylum-field-label">Sex</div>
+                                <div class="asylum-field-value" id="as_cardSex">-</div>
+                            </div>
+                            
+                            <div class="asylum-field">
+                                <div class="asylum-field-label">Nationality</div>
+                                <div class="asylum-field-value" id="as_cardNationality">-</div>
+                            </div>
+                            
+                            <div class="asylum-field">
+                                <div class="asylum-field-label">Passport Number</div>
+                                <div class="asylum-field-value" id="as_cardPassportNo">-</div>
+                            </div>
+                        </div>
+                        
+                        <div class="asylum-section">
+                            <h4>Arrival Information</h4>
+                            
+                            <div class="asylum-field">
+                                <div class="asylum-field-label">Date of Arrival in South Africa</div>
+                                <div class="asylum-field-value" id="as_cardArrival">-</div>
+                            </div>
+                            
+                            <div class="asylum-field">
+                                <div class="asylum-field-label">Port of Entry</div>
+                                <div class="asylum-field-value" id="as_cardPort">-</div>
+                            </div>
+                            
+                            <div class="asylum-field">
+                                <div class="asylum-field-label">Current Address in South Africa</div>
+                                <div class="asylum-field-value" id="as_cardAddress">-</div>
+                            </div>
+                        </div>
+                        
+                        <div class="asylum-section">
+                            <h4>Permit Validity</h4>
+                            
+                            <div style="display: flex; gap: 15px;">
+                                <div class="asylum-field" style="flex: 1;">
+                                    <div class="asylum-field-label">Date of Issue</div>
+                                    <div class="asylum-field-value" id="as_cardIssue">-</div>
+                                </div>
+                                
+                                <div class="asylum-field" style="flex: 1;">
+                                    <div class="asylum-field-label">Valid Until</div>
+                                    <div class="asylum-field-value" id="as_cardValid">-</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="asylum-footer">
+                    <div class="asylum-signature">
+                        <div class="asylum-signature-line"></div>
+                        <small>Signature of Holder</small>
+                    </div>
+                    
+                    <div class="asylum-signature">
+                        <div class="asylum-signature-line"></div>
+                        <small>Authorized Officer</small>
+                    </div>
+                </div>
+                
+                <div class="asylum-notice">
+                    <h4>⚠️ IMPORTANT NOTICE</h4>
+                    <p>This permit is issued in terms of Section 22 of the Refugees Act, 1998. The holder is permitted to sojourn in the Republic of South Africa for the period specified above, pending the finalization of their asylum application. This permit does not confer permanent residence rights. The holder must report to the Refugee Reception Office as required and must not engage in any activity prohibited by law.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let idPhotoData = null;
+        let passportPhotoData = null;
+        let asylumPhotoData = null;
+
+        // Tab switching
+        function switchTab(tab) {
+            const tabs = document.querySelectorAll('.tab');
+            const forms = document.querySelectorAll('.form-content');
+            const outputs = document.querySelectorAll('.document-container');
+            
+            tabs.forEach(t => t.classList.remove('active'));
+            forms.forEach(f => f.classList.remove('active'));
+            outputs.forEach(o => o.style.display = 'none');
+            
+            if (tab === 'id') {
+                tabs[0].classList.add('active');
+                document.getElementById('id-form').classList.add('active');
+            } else if (tab === 'passport') {
+                tabs[1].classList.add('active');
+                document.getElementById('passport-form').classList.add('active');
+            } else if (tab === 'asylum') {
+                tabs[2].classList.add('active');
+                document.getElementById('asylum-form').classList.add('active');
+            }
+        }
+
+        // Photo uploads
+        document.getElementById('id_photo').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    idPhotoData = event.target.result;
+                    document.getElementById('id_preview').src = idPhotoData;
+                    document.getElementById('id_preview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('pp_photo').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    passportPhotoData = event.target.result;
+                    document.getElementById('pp_preview').src = passportPhotoData;
+                    document.getElementById('pp_preview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        document.getElementById('as_photo').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    asylumPhotoData = event.target.result;
+                    document.getElementById('as_preview').src = asylumPhotoData;
+                    document.getElementById('as_preview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Generate ID Card
+        function generateIDCard() {
+            const idNumber = document.getElementById('id_idNumber').value;
+            const surname = document.getElementById('id_surname').value;
+            const names = document.getElementById('id_names').value;
+            const sex = document.getElementById('id_sex').value;
+            const dob = document.getElementById('id_dateOfBirth').value;
+            const nationality = document.getElementById('id_nationality').value;
+            const country = document.getElementById('id_countryOfBirth').value;
+            const status = document.getElementById('id_status').value;
+
+            if (!idNumber || !surname || !names || !dob) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            if (!idPhotoData) {
+                alert('Please upload a photo');
+                return;
+            }
+
+            document.getElementById('id_cardIdNumber').textContent = idNumber;
+            document.getElementById('id_cardSurname').textContent = surname.toUpperCase();
+            document.getElementById('id_cardNames').textContent = names.toUpperCase();
+            document.getElementById('id_cardSex').textContent = sex;
+            document.getElementById('id_cardDob').textContent = new Date(dob).toLocaleDateString('en-ZA');
+            document.getElementById('id_cardNationality').textContent = nationality;
+            document.getElementById('id_cardCountry').textContent = country;
+            document.getElementById('id_cardStatus').textContent = status;
+            document.getElementById('id_cardPhoto').src = idPhotoData;
+            document.getElementById('id_issueDate').textContent = new Date().toLocaleDateString('en-ZA');
+
+            document.getElementById('id-output').style.display = 'block';
+            document.getElementById('id-output').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Generate Passport
+        function generatePassport() {
+            const number = document.getElementById('pp_number').value;
+            const surname = document.getElementById('pp_surname').value;
+            const names = document.getElementById('pp_names').value;
+            const nationality = document.getElementById('pp_nationality').value;
+            const dob = document.getElementById('pp_dob').value;
+            const pob = document.getElementById('pp_pob').value;
+            const sex = document.getElementById('pp_sex').value;
+            const issue = document.getElementById('pp_issue').value;
+            const expiry = document.getElementById('pp_expiry').value;
+            const authority = document.getElementById('pp_authority').value;
+
+            if (!number || !surname || !names || !dob || !issue || !expiry) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            if (!passportPhotoData) {
+                alert('Please upload a photo');
+                return;
+            }
+
+            document.getElementById('pp_cardNumber').textContent = number;
+            document.getElementById('pp_cardSurname').textContent = surname.toUpperCase();
+            document.getElementById('pp_cardNames').textContent = names.toUpperCase();
+            document.getElementById('pp_cardNationality').textContent = nationality.toUpperCase();
+            document.getElementById('pp_cardDob').textContent = new Date(dob).toLocaleDateString('en-GB');
+            document.getElementById('pp_cardPob').textContent = pob.toUpperCase();
+            document.getElementById('pp_cardSex').textContent = sex;
+            document.getElementById('pp_cardIssue').textContent = new Date(issue).toLocaleDateString('en-GB');
+            document.getElementById('pp_cardExpiry').textContent = new Date(expiry).toLocaleDateString('en-GB');
+            document.getElementById('pp_cardAuthority').textContent = authority.toUpperCase();
+            document.getElementById('pp_cardPhoto').src = passportPhotoData;
+
+            document.getElementById('passport-output').style.display = 'block';
+            document.getElementById('passport-output').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Generate Asylum Paper
+        function generateAsylum() {
+            const refNumber = document.getElementById('as_refNumber').value;
+            const surname = document.getElementById('as_surname').value;
+            const names = document.getElementById('as_names').value;
+            const nationality = document.getElementById('as_nationality').value;
+            const dob = document.getElementById('as_dob').value;
+            const pob = document.getElementById('as_pob').value;
+            const sex = document.getElementById('as_sex').value;
+            const passportNo = document.getElementById('as_passportNo').value;
+            const arrival = document.getElementById('as_dateOfArrival').value;
+            const port = document.getElementById('as_portOfEntry').value;
+            const address = document.getElementById('as_address').value;
+            const issueDate = document.getElementById('as_issueDate').value;
+            const validUntil = document.getElementById('as_validUntil').value;
+
+            if (!refNumber || !surname || !names || !nationality || !dob || !arrival || !issueDate || !validUntil) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            if (!asylumPhotoData) {
+                alert('Please upload a photo');
+                return;
+            }
+
+            document.getElementById('as_cardRef').textContent = refNumber;
+            document.getElementById('as_cardSurname').textContent = surname.toUpperCase();
+            document.getElementById('as_cardNames').textContent = names.toUpperCase();
+            document.getElementById('as_cardNationality').textContent = nationality.toUpperCase();
+            document.getElementById('as_cardDob').textContent = new Date(dob).toLocaleDateString('en-ZA');
+            document.getElementById('as_cardPob').textContent = pob.toUpperCase();
+            document.getElementById('as_cardSex').textContent = sex;
+            document.getElementById('as_cardPassportNo').textContent = passportNo || 'N/A';
+            document.getElementById('as_cardArrival').textContent = new Date(arrival).toLocaleDateString('en-ZA');
+            document.getElementById('as_cardPort').textContent = port.toUpperCase();
+            document.getElementById('as_cardAddress').textContent = address;
+            document.getElementById('as_cardIssue').textContent = new Date(issueDate).toLocaleDateString('en-ZA');
+            document.getElementById('as_cardValid').textContent = new Date(validUntil).toLocaleDateString('en-ZA');
+            document.getElementById('as_cardPhoto').src = asylumPhotoData;
+
+            document.getElementById('asylum-output').style.display = 'block';
+            document.getElementById('asylum-output').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
