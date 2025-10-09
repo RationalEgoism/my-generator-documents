@@ -305,7 +305,7 @@
         /* PASSPORT STYLES */
         .passport {
             width: 600px;
-            height: 850px;
+            height: 1400px;
             background: linear-gradient(135deg, #003d82 0%, #002050 100%);
             border-radius: 10px;
             position: relative;
@@ -680,7 +680,12 @@
             <div class="form-section">
                 <div class="form-group">
                     <label for="pp_number">Passport Number</label>
-                    <input type="text" id="pp_number" placeholder="A00000000" maxlength="9">
+                    <input type="text" id="pp_number" placeholder="M00000000" maxlength="9">
+                </div>
+
+                <div class="form-group">
+                    <label for="pp_identity_no">Identity No</label>
+                    <input type="text" id="pp_identity_no" placeholder="8001014999082" maxlength="9">
                 </div>
                 
                 <div class="form-group">
@@ -704,15 +709,15 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="pp_pob">Place of Birth</label>
-                    <input type="text" id="pp_pob" placeholder="MVEZO, EASTERN CAPE">
+                    <label for="pp_pob_code">Place of Birth</label>
+                    <input type="text" id="pp_pob_code" placeholder="">
                 </div>
                 
                 <div class="form-group">
                     <label for="pp_sex">Sex</label>
                     <select id="pp_sex">
-                        <option value="M">M</option>
-                        <option value="F">F</option>
+                        <option value="M">Male</option>
+                        <option value="F">Female</option>
                     </select>
                 </div>
                 
@@ -729,6 +734,15 @@
                 <div class="form-group">
                     <label for="pp_authority">Issuing Authority</label>
                     <input type="text" id="pp_authority" value="DEPT OF HOME AFFAIRS">
+                </div>
+
+                <div class="form-group">
+                    <label for="pp_country_code">Country code</label>
+                    <input type="text" id="pp_country_code" value="">
+                </div>
+
+                <div class="generate-custom-data">
+                    <button class="generate-custom-data-btn" onclick="generatePassportCustomData()">Generate custom data</button>
                 </div>
                 
                 <div class="photo-upload">
@@ -926,6 +940,16 @@
                             <div class="passport-field">
                                 <div class="passport-field-label">Passport No. / Paspoort Nr.</div>
                                 <div class="passport-field-value passport-number" id="pp_cardNumber">-</div>
+                            </div>
+
+                            <div class="passport-field">
+                                <div class="passport-field-label">Country Code / Landkode</div>
+                                <div class="passport-field-value" id="pp_cardCountry">-</div>
+                            </div>
+
+                            <div class="passport-field">
+                                <div class="passport-field-label">Identity No. / Identiteit Nr.</div>
+                                <div class="passport-field-value" id="pp_cardIdentityNo">-</div>
                             </div>
                             
                             <div class="passport-field">
@@ -1336,12 +1360,109 @@
             return result;
         }
 
+        function calculateCheckDigit(data) {
+            const weights = [7, 3, 1];
+            let sum = 0;
+            for (let i = 0; i < data.length; i++) {
+                let char = data[i];
+                let value;
+                if (char === '<') {
+                    value = 0;
+                } else if (char >= '0' && char <= '9') {
+                    value = parseInt(char);
+                } else if (char >= 'A' && char <= 'Z') {
+                    value = char.charCodeAt(0) - 'A'.charCodeAt(0) + 10;
+                } else {
+                    // Handle other characters if necessary
+                    value = 0;
+                }
+                sum += value * weights[i % 3];
+            }
+            return sum % 10;
+        }
+
+        function formatDateForMRZ(dateString) {
+            const date = new Date(dateString);
+            const yy = date.getFullYear().toString().slice(2); // Get last two digits of the year
+            const mm = String(date.getMonth() + 1).padStart(2, '0'); // Month is zero-based, so we add 1
+            const dd = String(date.getDate()).padStart(2, '0'); // Ensure two-digit day
+
+            return `${yy}${mm}${dd}`;
+        }
+
+        function generateTD3MRZ(
+            documentType, issuingCountry, surname, givenNames,
+            documentNumber, pobCode, dateOfBirth, sex, expiryDate,
+            identityNo
+        ) {
+            console.log(documentType, issuingCountry, surname, givenNames,
+                documentNumber, pobCode, dateOfBirth, sex, expiryDate,
+                identityNo);
+            // Line 1
+            let line1 = documentType + issuingCountry;
+            console.log(line1);
+            let namePart = surname.toUpperCase() + '<<' + givenNames.toUpperCase();
+            line1 += namePart.padEnd(39, '<'); // Total 44 chars for line 1
+            console.log(line1);
+            // Line 2
+            const formattedDateOfBirth = formatDateForMRZ(dateOfBirth);
+            const formattedExpiryDate = formatDateForMRZ(expiryDate);
+            let line2 = documentNumber;
+            line2 += calculateCheckDigit(documentNumber);
+            line2 += pobCode;
+            line2 += formattedDateOfBirth; // YYMMDD
+            line2 += calculateCheckDigit(formattedDateOfBirth);
+            line2 += sex;
+            line2 += formattedExpiryDate; // YYMMDD
+            line2 += calculateCheckDigit(formattedExpiryDate);
+            line2 += identityNo.padEnd(14, '<'); // Optional field and padding
+            
+            // Calculate composite check digit for line 2 (example - this is a simplified representation)
+            let compositeData = documentNumber + calculateCheckDigit(documentNumber) +
+                                dateOfBirth + calculateCheckDigit(dateOfBirth) +
+                                expiryDate + calculateCheckDigit(expiryDate) +
+                                identityNo.padEnd(14, '<');
+            line2 += calculateCheckDigit(compositeData); // Final check digit for line 2
+
+            return line1 + '\n' + line2;
+        }
+
         async function generateSAIDCustomData() {
             const gender = 'F';
             
             fillPhoto(gender, 'id_preview');
             document.getElementById('id_nationality').value = getRandomItem(nationalities);
             document.getElementById('id_countryOfBirth').value = getRandomItem(countries).iso3;
+        }
+
+        async function generatePassportCustomData() {
+            const gender = getRandomItem(sexes);
+            const number = 'M' + Math.floor(Math.random() * 100000000).toString().padStart(8, '0');
+            const identityNo = Math.floor(Math.random() * 10000000000000).toString().padStart(13, '0');
+            const surname = generateSurname();
+            const names = generateName();
+            const nationality = getRandomItem(nationalities);
+            const dob = generateBirthday();
+            const pob_code = getRandomItem(countries).iso3;
+            const sex = gender;
+            const issue = generateFutureDay(1, 5);
+            const expiry = generateFutureDay(1, 5);
+            const authority = 'DEPT OF HOME AFFAIRS';
+            const countryCode = getRandomItem(countries).iso3;
+            document.getElementById('pp_number').value = number;
+            document.getElementById('pp_identity_no').value = identityNo;
+            document.getElementById('pp_surname').value = surname;
+            document.getElementById('pp_names').value = names;
+            document.getElementById('pp_nationality').value = nationality;
+            document.getElementById('pp_dob').value = dob;
+            document.getElementById('pp_pob_code').value = pob_code;
+            document.getElementById('pp_sex').value = sex;
+            document.getElementById('pp_issue').value = issue;
+            document.getElementById('pp_expiry').value = expiry;
+            document.getElementById('pp_authority').value = authority;
+            document.getElementById('pp_country_code').value = countryCode;
+
+            fillPhoto(gender, 'pp_preview');
         }
 
         async function generateAsylumCustomData() {
@@ -1468,15 +1589,17 @@
         // Generate Passport
         function generatePassport() {
             const number = document.getElementById('pp_number').value;
+            const identityNo = document.getElementById('pp_identity_no').value;
             const surname = document.getElementById('pp_surname').value;
             const names = document.getElementById('pp_names').value;
             const nationality = document.getElementById('pp_nationality').value;
             const dob = document.getElementById('pp_dob').value;
-            const pob = document.getElementById('pp_pob').value;
+            const pob_code = document.getElementById('pp_pob_code').value;
             const sex = document.getElementById('pp_sex').value;
             const issue = document.getElementById('pp_issue').value;
             const expiry = document.getElementById('pp_expiry').value;
             const authority = document.getElementById('pp_authority').value;
+            const countryCode = document.getElementById('pp_country_code').value;
 
             if (!number || !surname || !names || !dob || !issue || !expiry) {
                 alert('Please fill in all required fields');
@@ -1493,12 +1616,21 @@
             document.getElementById('pp_cardNames').textContent = names.toUpperCase();
             document.getElementById('pp_cardNationality').textContent = nationality.toUpperCase();
             document.getElementById('pp_cardDob').textContent = new Date(dob).toLocaleDateString('en-GB');
-            document.getElementById('pp_cardPob').textContent = pob.toUpperCase();
+            document.getElementById('pp_cardPob').textContent = pob_code.toUpperCase();
             document.getElementById('pp_cardSex').textContent = sex;
             document.getElementById('pp_cardIssue').textContent = new Date(issue).toLocaleDateString('en-GB');
             document.getElementById('pp_cardExpiry').textContent = new Date(expiry).toLocaleDateString('en-GB');
             document.getElementById('pp_cardAuthority').textContent = authority.toUpperCase();
             document.getElementById('pp_cardPhoto').src = passportPhotoData;
+            document.getElementById('pp_cardCountry').textContent = countryCode.toUpperCase();
+            document.getElementById('pp_cardIdentityNo').textContent = identityNo;
+
+            const mrzString = generateTD3MRZ(
+                'PM', countryCode, surname, names,
+                number, pob_code, dob, sex, expiry, identityNo,
+            );
+            console.log(mrzString);
+            document.getElementById('pp_mrz').textContent = mrzString;
 
             document.getElementById('passport-output').style.display = 'block';
             document.getElementById('passport-output').scrollIntoView({ behavior: 'smooth' });
