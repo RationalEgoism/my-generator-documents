@@ -116,6 +116,27 @@
             display: none;
         }
 
+        .generate-custom-data {
+            grid-column: 1 / -1;
+            text-align: center;
+        }
+
+        .generate-custom-data-btn {
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+            display: inline-block;
+        }
+
+        .generate-custom-data-btn:hover {
+            background: #5568d3;
+        }
+
         .upload-btn {
             background: #667eea;
             color: white;
@@ -591,32 +612,35 @@
         <!-- ID CARD FORM -->
         <div id="id-form" class="form-content active">
             <div class="form-section">
+                <p>IMPORTANT: We can only register 9901160965083, so we can't change birthday, citizenship, sex, surname, names. Before registering a user with an SA ID, please to remove the user from olympus admin panel</p>
+            </div>
+            <div class="form-section">
                 <div class="form-group">
-                    <label for="id_idNumber">ID Number</label>
-                    <input type="text" id="id_idNumber" placeholder="8001015009087" maxlength="13">
+                    <label for="id_idNumber">Identity Number</label>
+                    <input type="text" id="id_idNumber" value="9901160965083" placeholder="9901160965083" maxlength="13" disabled>
                 </div>
                 
                 <div class="form-group">
                     <label for="id_surname">Surname</label>
-                    <input type="text" id="id_surname" placeholder="MANDELA">
+                    <input type="text" value="VUMA" id="id_surname" placeholder="VUMA" disabled>
                 </div>
                 
                 <div class="form-group">
                     <label for="id_names">Names</label>
-                    <input type="text" id="id_names" placeholder="NELSON ROLIHLAHLA">
+                    <input type="text" value="THULISILE" id="id_names" placeholder="THULISILE" disabled>
                 </div>
                 
                 <div class="form-group">
                     <label for="id_sex">Sex</label>
-                    <select id="id_sex">
-                        <option value="M">Male</option>
+                    <select id="id_sex" disabled>
                         <option value="F">Female</option>
+                        <option value="M">Male</option>
                     </select>
                 </div>
                 
                 <div class="form-group">
                     <label for="id_dateOfBirth">Date of Birth</label>
-                    <input type="date" id="id_dateOfBirth">
+                    <input type="date" value="1999-01-16" id="id_dateOfBirth" disabled>
                 </div>
                 
                 <div class="form-group">
@@ -631,10 +655,14 @@
                 
                 <div class="form-group">
                     <label for="id_status">Status</label>
-                    <select id="id_status">
+                    <select id="id_status" disabled>
                         <option value="Citizen">Citizen</option>
                         <option value="Permanent Resident">Permanent Resident</option>
                     </select>
+                </div>
+
+                <div class="generate-custom-data">
+                    <button class="generate-custom-data-btn" onclick="generateSAIDCustomData()">Generate custom data</button>
                 </div>
                 
                 <div class="photo-upload">
@@ -1078,6 +1106,177 @@
         let passportPhotoData = null;
         let asylumPhotoData = null;
 
+        const photoFemaleFiles = ['face_01.png', 'face_02.png', 'face_03.png'];
+        const photoMaleFiles = ['face_04.png', 'face_05.png', 'face_06.png', 'face_07.png'];
+
+        const sexes = ['M', 'F'];
+        const nationalities = ['Zulu', 'Xhosa', 'Sotho', 'Tswana', 'Coloureds', 'Whites'];
+
+        const maleFirstNames = [
+            'James', 'John', 'Michael', 'David', 'William', 'Robert', 'Joseph', 'Charles',
+            'Thomas', 'Daniel', 'Matthew', 'Christopher', 'Andrew', 'Ryan', 'Alexander',
+            'Liam', 'Noah', 'Oliver', 'Ethan', 'Lucas', 'Mason', 'Logan', 'Benjamin',
+            'Sebastian', 'Jack', 'Henry', 'Owen', 'Samuel', 'Leo', 'Nathan', 'Gabriel'
+        ];
+
+        const femaleFirstNames = [
+            'Mary', 'Emma', 'Olivia', 'Ava', 'Isabella', 'Sophia', 'Mia', 'Charlotte',
+            'Amelia', 'Harper', 'Evelyn', 'Abigail', 'Emily', 'Elizabeth', 'Sofia',
+            'Avery', 'Ella', 'Scarlett', 'Grace', 'Chloe', 'Victoria', 'Riley', 'Aria',
+            'Lily', 'Aubrey', 'Zoey', 'Penelope', 'Hannah', 'Layla', 'Nora', 'Madison'
+        ];
+
+        const lastNames = [
+            'Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis',
+            'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez', 'Wilson', 'Anderson',
+            'Thomas', 'Taylor', 'Moore', 'Jackson', 'Martin', 'Lee', 'Thompson', 'White',
+            'Harris', 'Clark', 'Lewis', 'Robinson', 'Walker', 'Young', 'Hall', 'Allen',
+            'King', 'Wright', 'Scott', 'Green', 'Baker', 'Adams', 'Nelson', 'Carter',
+            'Mitchell', 'Roberts', 'Turner', 'Phillips', 'Campbell', 'Parker', 'Evans',
+            'Edwards', 'Collins', 'Stewart', 'Morris', 'Murphy', 'Cook', 'Rogers', 'Morgan',
+            'Peterson', 'Cooper', 'Reed', 'Bailey', 'Bell', 'Gomez', 'Kelly', 'Howard'
+        ];
+
+        const countries = [
+            { name: 'United States', iso2: 'US', iso3: 'USA', phone: '+1', flag: '🇺🇸' },
+            { name: 'United Kingdom', iso2: 'GB', iso3: 'GBR', phone: '+44', flag: '🇬🇧' },
+            { name: 'Canada', iso2: 'CA', iso3: 'CAN', phone: '+1', flag: '🇨🇦' },
+            { name: 'Australia', iso2: 'AU', iso3: 'AUS', phone: '+61', flag: '🇦🇺' },
+            { name: 'Germany', iso2: 'DE', iso3: 'DEU', phone: '+49', flag: '🇩🇪' },
+            { name: 'France', iso2: 'FR', iso3: 'FRA', phone: '+33', flag: '🇫🇷' },
+            { name: 'Italy', iso2: 'IT', iso3: 'ITA', phone: '+39', flag: '🇮🇹' },
+            { name: 'Spain', iso2: 'ES', iso3: 'ESP', phone: '+34', flag: '🇪🇸' },
+            { name: 'Japan', iso2: 'JP', iso3: 'JPN', phone: '+81', flag: '🇯🇵' },
+            { name: 'China', iso2: 'CN', iso3: 'CHN', phone: '+86', flag: '🇨🇳' },
+            { name: 'India', iso2: 'IN', iso3: 'IND', phone: '+91', flag: '🇮🇳' },
+            { name: 'Brazil', iso2: 'BR', iso3: 'BRA', phone: '+55', flag: '🇧🇷' },
+            { name: 'Mexico', iso2: 'MX', iso3: 'MEX', phone: '+52', flag: '🇲🇽' },
+            { name: 'South Africa', iso2: 'ZA', iso3: 'ZAF', phone: '+27', flag: '🇿🇦' },
+            { name: 'Nigeria', iso2: 'NG', iso3: 'NGA', phone: '+234', flag: '🇳🇬' },
+            { name: 'Egypt', iso2: 'EG', iso3: 'EGY', phone: '+20', flag: '🇪🇬' },
+            { name: 'Russia', iso2: 'RU', iso3: 'RUS', phone: '+7', flag: '🇷🇺' },
+            { name: 'South Korea', iso2: 'KR', iso3: 'KOR', phone: '+82', flag: '🇰🇷' },
+            { name: 'Netherlands', iso2: 'NL', iso3: 'NLD', phone: '+31', flag: '🇳🇱' },
+            { name: 'Switzerland', iso2: 'CH', iso3: 'CHE', phone: '+41', flag: '🇨🇭' },
+            { name: 'Sweden', iso2: 'SE', iso3: 'SWE', phone: '+46', flag: '🇸🇪' },
+            { name: 'Norway', iso2: 'NO', iso3: 'NOR', phone: '+47', flag: '🇳🇴' },
+            { name: 'Denmark', iso2: 'DK', iso3: 'DNK', phone: '+45', flag: '🇩🇰' },
+            { name: 'Austria', iso2: 'AT', iso3: 'AUT', phone: '+43', flag: '🇦🇹' },
+            { name: 'Belgium', iso2: 'BE', iso3: 'BEL', phone: '+32', flag: '🇧🇪' },
+            { name: 'Poland', iso2: 'PL', iso3: 'POL', phone: '+48', flag: '🇵🇱' },
+            { name: 'Portugal', iso2: 'PT', iso3: 'PRT', phone: '+351', flag: '🇵🇹' },
+            { name: 'Greece', iso2: 'GR', iso3: 'GRC', phone: '+30', flag: '🇬🇷' },
+            { name: 'Turkey', iso2: 'TR', iso3: 'TUR', phone: '+90', flag: '🇹🇷' },
+            { name: 'Argentina', iso2: 'AR', iso3: 'ARG', phone: '+54', flag: '🇦🇷' },
+            { name: 'Chile', iso2: 'CL', iso3: 'CHL', phone: '+56', flag: '🇨🇱' },
+            { name: 'Colombia', iso2: 'CO', iso3: 'COL', phone: '+57', flag: '🇨🇴' },
+            { name: 'Peru', iso2: 'PE', iso3: 'PER', phone: '+51', flag: '🇵🇪' },
+            { name: 'Thailand', iso2: 'TH', iso3: 'THA', phone: '+66', flag: '🇹🇭' },
+            { name: 'Vietnam', iso2: 'VN', iso3: 'VNM', phone: '+84', flag: '🇻🇳' },
+            { name: 'Indonesia', iso2: 'ID', iso3: 'IDN', phone: '+62', flag: '🇮🇩' },
+            { name: 'Malaysia', iso2: 'MY', iso3: 'MYS', phone: '+60', flag: '🇲🇾' },
+            { name: 'Singapore', iso2: 'SG', iso3: 'SGP', phone: '+65', flag: '🇸🇬' },
+            { name: 'Philippines', iso2: 'PH', iso3: 'PHL', phone: '+63', flag: '🇵🇭' },
+            { name: 'New Zealand', iso2: 'NZ', iso3: 'NZL', phone: '+64', flag: '🇳🇿' },
+            { name: 'Ireland', iso2: 'IE', iso3: 'IRL', phone: '+353', flag: '🇮🇪' },
+            { name: 'Finland', iso2: 'FI', iso3: 'FIN', phone: '+358', flag: '🇫🇮' },
+            { name: 'Czech Republic', iso2: 'CZ', iso3: 'CZE', phone: '+420', flag: '🇨🇿' },
+            { name: 'Israel', iso2: 'IL', iso3: 'ISR', phone: '+972', flag: '🇮🇱' },
+            { name: 'Saudi Arabia', iso2: 'SA', iso3: 'SAU', phone: '+966', flag: '🇸🇦' },
+            { name: 'United Arab Emirates', iso2: 'AE', iso3: 'ARE', phone: '+971', flag: '🇦🇪' },
+            { name: 'Pakistan', iso2: 'PK', iso3: 'PAK', phone: '+92', flag: '🇵🇰' },
+            { name: 'Bangladesh', iso2: 'BD', iso3: 'BGD', phone: '+880', flag: '🇧🇩' },
+            { name: 'Kenya', iso2: 'KE', iso3: 'KEN', phone: '+254', flag: '🇰🇪' },
+            { name: 'Morocco', iso2: 'MA', iso3: 'MAR', phone: '+212', flag: '🇲🇦' }
+        ];
+
+        const statuses = ['Citizen', 'Permanent Resident'];
+
+        function getRandomItem(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function generateName() {
+            const gender = Math.random() < 0.5 ? 'M' : 'F';
+            return generateNameByGender(gender);
+        }
+
+        function generateNameByGender(gender) {
+            const firstNameList = gender === 'M' ? maleFirstNames : femaleFirstNames;
+            return getRandomItem(firstNameList);
+        }
+
+        function generateSurname() {
+            return getRandomItem(lastNames);
+        }
+
+        function getRandomItem(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function generateBirthday() {
+            // Generate for ages 16-80
+            const birthday = generateBirthdayAge(16, 80);
+            console.log(birthday);
+            return birthday;
+        }
+
+        function generateBirthdayAge(minAge, maxAge) {
+            const today = new Date();
+            
+            // Calculate date range
+            const maxDate = new Date(today);
+            maxDate.setFullYear(today.getFullYear() - minAge);
+            
+            const minDate = new Date(today);
+            minDate.setFullYear(today.getFullYear() - maxAge - 1);
+            
+            // Generate random timestamp between min and max
+            const randomTime = minDate.getTime() + Math.random() * (maxDate.getTime() - minDate.getTime());
+            const birthday = new Date(randomTime);
+            
+            // Calculate exact age
+            const age = calculateAge(birthday, today);
+
+            const day = birthday.getDate();
+            const month = birthday.getMonth();
+            const year = birthday.getFullYear();
+
+            return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        }
+
+        function calculateAge(birthDate, currentDate) {
+            let age = currentDate.getFullYear() - birthDate.getFullYear();
+            const monthDiff = currentDate.getMonth() - birthDate.getMonth();
+            
+            if (monthDiff < 0 || (monthDiff === 0 && currentDate.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            
+            return age;
+        }
+
+        async function fillPhoto(gender) {
+            const photoFiles = gender === 'M' ? photoMaleFiles : photoFemaleFiles;
+            const photoFile = getRandomItem(photoFiles);
+            const blob = await fetch(photoFile).then(res => res.blob());
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                idPhotoData = event.target.result;
+                document.getElementById('id_preview').src = idPhotoData;
+                document.getElementById('id_preview').style.display = 'block';
+            };
+            reader.readAsDataURL(blob);
+        }
+
+        async function generateSAIDCustomData() {
+            const gender = 'F';
+            
+            fillPhoto(gender);
+            document.getElementById('id_nationality').value = getRandomItem(nationalities);
+            document.getElementById('id_countryOfBirth').value = getRandomItem(countries).iso3;
+        }
+
         // Tab switching
         function switchTab(tab) {
             const tabs = document.querySelectorAll('.tab');
@@ -1150,6 +1349,8 @@
             const nationality = document.getElementById('id_nationality').value;
             const country = document.getElementById('id_countryOfBirth').value;
             const status = document.getElementById('id_status').value;
+
+            console.log(idNumber, surname, names, sex, dob, nationality, country, status);
 
             if (!idNumber || !surname || !names || !dob) {
                 alert('Please fill in all required fields');
