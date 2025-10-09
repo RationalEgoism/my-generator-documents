@@ -777,8 +777,8 @@
                 <div class="form-group">
                     <label for="as_sex">Sex</label>
                     <select id="as_sex">
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
+                        <option value="M">Male</option>
+                        <option value="F">Female</option>
                     </select>
                 </div>
                 
@@ -810,6 +810,10 @@
                 <div class="form-group">
                     <label for="as_validUntil">Valid Until</label>
                     <input type="date" id="as_validUntil">
+                </div>
+
+                <div class="generate-custom-data">
+                    <button class="generate-custom-data-btn" onclick="generateAsylumCustomData()">Generate custom data</button>
                 </div>
                 
                 <div class="photo-upload">
@@ -1216,9 +1220,7 @@
 
         function generateBirthday() {
             // Generate for ages 16-80
-            const birthday = generateBirthdayAge(16, 80);
-            console.log(birthday);
-            return birthday;
+            return generateBirthdayAge(16, 80);
         }
 
         function generateBirthdayAge(minAge, maxAge) {
@@ -1245,6 +1247,30 @@
             return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         }
 
+        function generateFutureDay(minYear, maxYear) {
+            const today = new Date();
+            
+            // Calculate date range
+            const maxDate = new Date(today);
+            maxDate.setFullYear(today.getFullYear() + minYear);
+            
+            const minDate = new Date(today);
+            minDate.setFullYear(today.getFullYear() + maxYear);
+            
+            // Generate random timestamp between min and max
+            const randomTime = minDate.getTime() + Math.random() * (maxDate.getTime() - minDate.getTime());
+            const birthday = new Date(randomTime);
+            
+            // Calculate exact age
+            const age = calculateAge(birthday, today);
+
+            const day = birthday.getDate();
+            const month = birthday.getMonth();
+            const year = birthday.getFullYear();
+
+            return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        }
+
         function calculateAge(birthDate, currentDate) {
             let age = currentDate.getFullYear() - birthDate.getFullYear();
             const monthDiff = currentDate.getMonth() - birthDate.getMonth();
@@ -1256,25 +1282,87 @@
             return age;
         }
 
-        async function fillPhoto(gender) {
+        function generateAddress() {
+            const streets = ['123 Main St', '456 Oak Ave'];
+            const apartments = ['Apt 4B', '', 'Unit 7'];
+            const cities = ['Springfield', 'Greenville'];
+            const zips = ['62704', '12345'];
+            const countries = ['USA', 'Canada'];
+
+            const addresses = [];
+
+            const maxLength = Math.max(streets.length, apartments.length, cities.length, zips.length, countries.length);
+
+            const parts = [
+                streets[Math.floor(Math.random() * maxLength)] || '',
+                apartments[Math.floor(Math.random() * maxLength)] || '',
+                cities[Math.floor(Math.random() * maxLength)] || '',
+                zips[Math.floor(Math.random() * maxLength)] || '',
+                countries[Math.floor(Math.random() * maxLength)] || ''
+            ].filter(Boolean); // Remove empty strings
+
+            return parts.join(', ');
+        }
+
+        async function fillPhoto(gender, identifier) {
             const photoFiles = gender === 'M' ? photoMaleFiles : photoFemaleFiles;
             const photoFile = getRandomItem(photoFiles);
             const blob = await fetch(photoFile).then(res => res.blob());
             const reader = new FileReader();
             reader.onload = function(event) {
-                idPhotoData = event.target.result;
-                document.getElementById('id_preview').src = idPhotoData;
-                document.getElementById('id_preview').style.display = 'block';
+                if (identifier === 'id_preview') {
+                    idPhotoData = event.target.result;
+                    document.getElementById('id_preview').src = idPhotoData;
+                    document.getElementById('id_preview').style.display = 'block';
+                } else if (identifier === 'pp_preview') {
+                    passportPhotoData = event.target.result;
+                    document.getElementById('pp_preview').src = passportPhotoData;
+                    document.getElementById('pp_preview').style.display = 'block';
+                } else if (identifier === 'as_preview') {
+                    asylumPhotoData = event.target.result;
+                    document.getElementById('as_preview').src = asylumPhotoData;
+                    document.getElementById('as_preview').style.display = 'block';
+                }
             };
             reader.readAsDataURL(blob);
+        }
+
+        function generateRandomString(length) {
+            const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            let result = "";
+            for (let i = 0; i < length; i++) {
+                result += characters.charAt(Math.floor(Math.random() * characters.length));
+            }
+            return result;
         }
 
         async function generateSAIDCustomData() {
             const gender = 'F';
             
-            fillPhoto(gender);
+            fillPhoto(gender, 'id_preview');
             document.getElementById('id_nationality').value = getRandomItem(nationalities);
             document.getElementById('id_countryOfBirth').value = getRandomItem(countries).iso3;
+        }
+
+        async function generateAsylumCustomData() {
+            const gender = getRandomItem(sexes);
+            const randomNumber = Math.floor(Math.random() * 100000).toString().padStart(5, '0');
+            const surname = generateSurname();
+            document.getElementById('as_refNumber').value = `ASY2024${randomNumber}`;
+            document.getElementById('as_surname').value = surname;
+            document.getElementById('as_names').value = surname + ' ' + generateName();
+            document.getElementById('as_nationality').value = getRandomItem(nationalities);
+            document.getElementById('as_dob').value = generateBirthday();
+            document.getElementById('as_pob').value = getRandomItem(countries).name;
+            document.getElementById('as_sex').value = gender;
+            document.getElementById('as_passportNo').value = Math.floor(Math.random() * 100000).toString().padStart(10, '0');
+            document.getElementById('as_dateOfArrival').value = generateBirthdayAge(0, 16);;
+            document.getElementById('as_portOfEntry').value = getRandomItem(countries).name;
+            document.getElementById('as_address').value = generateAddress();
+            document.getElementById('as_issueDate').value = generateFutureDay(1, 5);
+            document.getElementById('as_validUntil').value = generateFutureDay(1, 5);
+
+            fillPhoto(gender, 'as_preview');
         }
 
         // Tab switching
