@@ -770,8 +770,8 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="as_names">Full Names</label>
-                    <input type="text" id="as_names" placeholder="FULL NAMES">
+                    <label for="as_names">First name</label>
+                    <input type="text" id="as_names" placeholder="First name">
                 </div>
                 
                 <div class="form-group">
@@ -1043,7 +1043,7 @@
                             </div>
                             
                             <div class="asylum-field">
-                                <div class="asylum-field-label">Full Names</div>
+                                <div class="asylum-field-label">First name(s)</div>
                                 <div class="asylum-field-value" id="as_cardNames">-</div>
                             </div>
                             
@@ -1464,10 +1464,9 @@
         async function generateAsylumCustomData() {
             const gender = getRandomItem(sexes);
             const randomNumber = Math.floor(Math.random() * 100000).toString().padStart(5, '0');
-            const surname = generateSurname();
             document.getElementById('as_refNumber').value = `ASY2024${randomNumber}`;
-            document.getElementById('as_surname').value = surname;
-            document.getElementById('as_names').value = surname + ' ' + generateName();
+            document.getElementById('as_surname').value = generateSurname();
+            document.getElementById('as_names').value = generateName();
             document.getElementById('as_nationality').value = getRandomItem(nationalities);
             document.getElementById('as_dob').value = generateBirthday();
             document.getElementById('as_pob').value = getRandomItem(countries).name;
