@@ -1225,11 +1225,6 @@
             return arr[Math.floor(Math.random() * arr.length)];
         }
 
-        function generateName() {
-            const gender = Math.random() < 0.5 ? 'M' : 'F';
-            return generateNameByGender(gender);
-        }
-
         function generateNameByGender(gender) {
             const firstNameList = gender === 'M' ? maleFirstNames : femaleFirstNames;
             return getRandomItem(firstNameList);
@@ -1436,7 +1431,7 @@
             const number = 'M' + Math.floor(Math.random() * 100000000).toString().padStart(8, '0');
             const identityNo = Math.floor(Math.random() * 10000000000000).toString().padStart(13, '0');
             const surname = generateSurname();
-            const names = generateName();
+            const names = generateNameByGender(gender);
             const nationality = getRandomItem(nationalities);
             const dob = generateBirthday();
             const pob_code = getRandomItem(countries).iso3;
@@ -1466,7 +1461,7 @@
             const randomNumber = Math.floor(Math.random() * 100000).toString().padStart(5, '0');
             document.getElementById('as_refNumber').value = `ASY2024${randomNumber}`;
             document.getElementById('as_surname').value = generateSurname();
-            document.getElementById('as_names').value = generateName();
+            document.getElementById('as_names').value = generateNameByGender(gender);
             document.getElementById('as_nationality').value = getRandomItem(nationalities);
             document.getElementById('as_dob').value = generateBirthday();
             document.getElementById('as_pob').value = getRandomItem(countries).name;
