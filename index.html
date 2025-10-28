@@ -171,6 +171,24 @@
             background: #218838;
         }
 
+        .download-btn {
+            width: 100%;
+            background: #007bff;
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 20px;
+        }
+
+        .download-btn:hover {
+            background: #0056b3;
+        }
+
         .preview-photo {
             margin-top: 10px;
             max-width: 150px;
@@ -844,7 +862,8 @@
 
         <!-- ID CARD OUTPUT -->
         <div id="id-output" class="document-container">
-            <div class="id-card">
+            <button class="download-btn" onclick="downloadDocument('id-card', 'SA_ID_Card')">Скачать ID Card</button>
+            <div class="id-card" id="id-card">
                 <div class="id-card-header">
                     <div class="coat-of-arms">SA Coat of Arms</div>
                     <div class="header-text">
@@ -912,6 +931,7 @@
 
         <!-- PASSPORT OUTPUT -->
         <div id="passport-output" class="document-container">
+            <button class="download-btn" onclick="downloadDocument('passport', 'SA_Passport')">Скачать Passport</button>
             <div class="passport">
                 <div class="passport-cover">
                     <div class="passport-coat">SA Coat of Arms</div>
@@ -1015,6 +1035,7 @@
 
         <!-- ASYLUM PAPER OUTPUT -->
         <div id="asylum-output" class="document-container">
+            <button class="download-btn" onclick="downloadDocument('asylum-paper', 'SA_Asylum_Paper')">Скачать Asylum Paper</button>
             <div class="asylum-paper">
                 <div class="asylum-header">
                     <div class="asylum-logo">REPUBLIC OF SOUTH AFRICA</div>
@@ -1670,6 +1691,53 @@
 
             document.getElementById('asylum-output').style.display = 'block';
             document.getElementById('asylum-output').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Download document as image
+        function downloadDocument(elementId, filename) {
+            const element = document.getElementById(elementId);
+            if (!element) {
+                alert('Документ не найден. Пожалуйста, сначала сгенерируйте документ.');
+                return;
+            }
+
+            // Use html2canvas library to convert HTML element to image
+            // First, we need to load the library if not already loaded
+            if (typeof html2canvas === 'undefined') {
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+                script.onload = function() {
+                    captureAndDownload(element, filename);
+                };
+                document.head.appendChild(script);
+            } else {
+                captureAndDownload(element, filename);
+            }
+        }
+
+        function captureAndDownload(element, filename) {
+            html2canvas(element, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: null
+            }).then(function(canvas) {
+                // Convert canvas to blob
+                canvas.toBlob(function(blob) {
+                    // Create download link
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename + '.png';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                });
+            }).catch(function(error) {
+                console.error('Error capturing document:', error);
+                alert('Ошибка при создании изображения. Попробуйте еще раз.');
+            });
         }
     </script>
 </body>
