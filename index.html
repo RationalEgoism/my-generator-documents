@@ -727,7 +727,7 @@
 <body>
     <div class="container">
         <h1>🇿🇦 South African Document Generator</h1>
-        <div class="version">Version 1.2.0</div>
+        <div class="version">Version 1.2.1</div>
 
         <div class="tabs">
             <button class="tab active" onclick="switchTab('id')">ID Card</button>
@@ -1040,7 +1040,7 @@
         <!-- PASSPORT OUTPUT -->
         <div id="passport-output" class="document-container">
             <button class="download-btn" id="passport-download-btn" style="display: none;" onclick="downloadDocument('passport', 'SA_Passport')">Скачать Passport</button>
-            <div class="passport">
+            <div class="passport" id="passport">
                 <div class="passport-cover">
                     <div class="passport-coat">SA Coat of Arms</div>
                     <div class="passport-title">SOUTH AFRICA</div>
@@ -1144,7 +1144,7 @@
         <!-- ASYLUM PAPER OUTPUT -->
         <div id="asylum-output" class="document-container">
             <button class="download-btn" id="asylum-download-btn" style="display: none;" onclick="downloadDocument('asylum-paper', 'SA_Asylum_Paper')">Скачать Asylum Paper</button>
-            <div class="asylum-paper">
+            <div class="asylum-paper" id="asylum-paper">
                 <div class="asylum-header">
                     <div class="asylum-logo">REPUBLIC OF SOUTH AFRICA</div>
                     <h2>DEPARTMENT OF HOME AFFAIRS</h2>
