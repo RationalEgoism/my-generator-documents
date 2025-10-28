@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, user-scalable=yes">
     <title>SA Document Generator</title>
     <style>
         * {
@@ -213,6 +213,7 @@
             display: none;
             overflow-x: auto;
             width: 100%;
+            overflow: visible;
         }
 
         /* ID CARD STYLES */
@@ -631,20 +632,36 @@
             }
         }
 
+        @media (max-width: 900px) {
+            .document-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding-bottom: 20px;
+            }
+
+            .id-card, .passport, .asylum-paper {
+                margin-bottom: 20px;
+            }
+        }
+
         @media (max-width: 700px) {
             .id-card {
                 transform: scale(0.9);
                 transform-origin: top center;
+                margin-bottom: 20px;
             }
 
             .passport {
                 transform: scale(0.7);
                 transform-origin: top center;
+                margin-bottom: 20px;
             }
 
             .asylum-paper {
                 transform: scale(0.85);
                 transform-origin: top center;
+                margin-bottom: 20px;
             }
 
             .container {
@@ -656,16 +673,19 @@
             .id-card {
                 transform: scale(0.7);
                 transform-origin: top center;
+                margin-bottom: 20px;
             }
 
             .passport {
                 transform: scale(0.5);
                 transform-origin: top center;
+                margin-bottom: 20px;
             }
 
             .asylum-paper {
                 transform: scale(0.65);
                 transform-origin: top center;
+                margin-bottom: 20px;
             }
 
             .download-btn {
@@ -679,16 +699,19 @@
             .id-card {
                 transform: scale(0.55);
                 transform-origin: top center;
+                margin-bottom: 20px;
             }
 
             .passport {
                 transform: scale(0.35);
                 transform-origin: top center;
+                margin-bottom: 20px;
             }
 
             .asylum-paper {
                 transform: scale(0.5);
                 transform-origin: top center;
+                margin-bottom: 20px;
             }
         }
     </style>
@@ -696,7 +719,7 @@
 <body>
     <div class="container">
         <h1>🇿🇦 South African Document Generator</h1>
-        <div class="version">Version 1.0.1</div>
+        <div class="version">Version 1.0.2</div>
 
         <div class="tabs">
             <button class="tab active" onclick="switchTab('id')">ID Card</button>
@@ -1776,27 +1799,52 @@
                 return;
             }
 
+            // Generate unique filename with timestamp
+            const timestamp = new Date().getTime();
+            const uniqueFilename = `${filename}_${timestamp}`;
+
             // Use html2canvas library to convert HTML element to image
             // First, we need to load the library if not already loaded
             if (typeof html2canvas === 'undefined') {
                 const script = document.createElement('script');
                 script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
                 script.onload = function() {
-                    captureAndDownload(element, filename);
+                    captureAndDownload(element, uniqueFilename);
                 };
                 document.head.appendChild(script);
             } else {
-                captureAndDownload(element, filename);
+                captureAndDownload(element, uniqueFilename);
             }
         }
 
         function captureAndDownload(element, filename) {
+            // Store original transform
+            const originalTransform = element.style.transform;
+            const originalTransformOrigin = element.style.transformOrigin;
+
+            // Temporarily remove transform to capture at full size
+            element.style.transform = 'none';
+            element.style.transformOrigin = 'initial';
+
+            // Get the natural dimensions of the element
+            const rect = element.getBoundingClientRect();
+            const width = element.offsetWidth;
+            const height = element.offsetHeight;
+
             html2canvas(element, {
-                scale: 2,
+                scale: 3,
                 useCORS: true,
                 allowTaint: true,
-                backgroundColor: null
+                backgroundColor: null,
+                width: width,
+                height: height,
+                windowWidth: width,
+                windowHeight: height
             }).then(function(canvas) {
+                // Restore original transform
+                element.style.transform = originalTransform;
+                element.style.transformOrigin = originalTransformOrigin;
+
                 // Convert canvas to blob
                 canvas.toBlob(function(blob) {
                     // Create download link
@@ -1810,6 +1858,9 @@
                     URL.revokeObjectURL(url);
                 });
             }).catch(function(error) {
+                // Restore original transform even on error
+                element.style.transform = originalTransform;
+                element.style.transformOrigin = originalTransformOrigin;
                 console.error('Error capturing document:', error);
                 alert('Ошибка при создании изображения. Попробуйте еще раз.');
             });
