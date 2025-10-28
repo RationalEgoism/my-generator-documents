@@ -723,7 +723,7 @@
 <body>
     <div class="container">
         <h1>🇿🇦 South African Document Generator</h1>
-        <div class="version">Version 1.0.5</div>
+        <div class="version">Version 1.0.6</div>
 
         <div class="tabs">
             <button class="tab active" onclick="switchTab('id')">ID Card</button>
@@ -794,7 +794,7 @@
                 </div>
             </div>
             
-            <button class="generate-btn" onclick="generateIDCard()">Generate ID Card</button>
+            <button class="generate-btn" id="id-generate-btn" style="display: none;" onclick="generateIDCard()">Generate ID Card</button>
         </div>
 
         <!-- PASSPORT FORM -->
@@ -874,7 +874,7 @@
                 </div>
             </div>
             
-            <button class="generate-btn" onclick="generatePassport()">Generate Passport</button>
+            <button class="generate-btn" id="passport-generate-btn" style="display: none;" onclick="generatePassport()">Generate Passport</button>
         </div>
 
         <!-- ASYLUM PAPER FORM -->
@@ -959,12 +959,12 @@
                 </div>
             </div>
             
-            <button class="generate-btn" onclick="generateAsylum()">Generate Asylum Paper</button>
+            <button class="generate-btn" id="asylum-generate-btn" style="display: none;" onclick="generateAsylum()">Generate Asylum Paper</button>
         </div>
 
         <!-- ID CARD OUTPUT -->
         <div id="id-output" class="document-container">
-            <button class="download-btn" onclick="downloadDocument('id-card', 'SA_ID_Card')">Скачать ID Card</button>
+            <button class="download-btn" id="id-download-btn" style="display: none;" onclick="downloadDocument('id-card', 'SA_ID_Card')">Скачать ID Card</button>
             <div class="id-card" id="id-card">
                 <div class="id-card-header">
                     <div class="coat-of-arms">SA Coat of Arms</div>
@@ -1033,7 +1033,7 @@
 
         <!-- PASSPORT OUTPUT -->
         <div id="passport-output" class="document-container">
-            <button class="download-btn" onclick="downloadDocument('passport', 'SA_Passport')">Скачать Passport</button>
+            <button class="download-btn" id="passport-download-btn" style="display: none;" onclick="downloadDocument('passport', 'SA_Passport')">Скачать Passport</button>
             <div class="passport">
                 <div class="passport-cover">
                     <div class="passport-coat">SA Coat of Arms</div>
@@ -1137,7 +1137,7 @@
 
         <!-- ASYLUM PAPER OUTPUT -->
         <div id="asylum-output" class="document-container">
-            <button class="download-btn" onclick="downloadDocument('asylum-paper', 'SA_Asylum_Paper')">Скачать Asylum Paper</button>
+            <button class="download-btn" id="asylum-download-btn" style="display: none;" onclick="downloadDocument('asylum-paper', 'SA_Asylum_Paper')">Скачать Asylum Paper</button>
             <div class="asylum-paper">
                 <div class="asylum-header">
                     <div class="asylum-logo">REPUBLIC OF SOUTH AFRICA</div>
@@ -1544,10 +1544,13 @@
 
         async function generateSAIDCustomData() {
             const gender = 'F';
-            
+
             fillPhoto(gender, 'id_preview');
             document.getElementById('id_nationality').value = getRandomItem(nationalities);
             document.getElementById('id_countryOfBirth').value = getRandomItem(countries).iso3;
+
+            // Show generate button
+            document.getElementById('id-generate-btn').style.display = 'block';
         }
 
         async function generatePassportCustomData() {
@@ -1578,6 +1581,9 @@
             document.getElementById('pp_country_code').value = countryCode;
 
             fillPhoto(gender, 'pp_preview');
+
+            // Show generate button
+            document.getElementById('passport-generate-btn').style.display = 'block';
         }
 
         async function generateAsylumCustomData() {
@@ -1598,6 +1604,9 @@
             document.getElementById('as_validUntil').value = generateFutureDay(1, 5);
 
             fillPhoto(gender, 'as_preview');
+
+            // Show generate button
+            document.getElementById('asylum-generate-btn').style.display = 'block';
         }
 
         // Tab switching
@@ -1605,20 +1614,35 @@
             const tabs = document.querySelectorAll('.tab');
             const forms = document.querySelectorAll('.form-content');
             const outputs = document.querySelectorAll('.document-container');
-            
+
             tabs.forEach(t => t.classList.remove('active'));
             forms.forEach(f => f.classList.remove('active'));
             outputs.forEach(o => o.style.display = 'none');
-            
+
             if (tab === 'id') {
                 tabs[0].classList.add('active');
                 document.getElementById('id-form').classList.add('active');
+                // Show only ID output if it was generated
+                const idOutput = document.getElementById('id-output');
+                if (idOutput.querySelector('#id-card .id-photo img').src) {
+                    idOutput.style.display = 'block';
+                }
             } else if (tab === 'passport') {
                 tabs[1].classList.add('active');
                 document.getElementById('passport-form').classList.add('active');
+                // Show only Passport output if it was generated
+                const ppOutput = document.getElementById('passport-output');
+                if (ppOutput.querySelector('.passport-photo img').src) {
+                    ppOutput.style.display = 'block';
+                }
             } else if (tab === 'asylum') {
                 tabs[2].classList.add('active');
                 document.getElementById('asylum-form').classList.add('active');
+                // Show only Asylum output if it was generated
+                const asOutput = document.getElementById('asylum-output');
+                if (asOutput.querySelector('.asylum-photo img').src) {
+                    asOutput.style.display = 'block';
+                }
             }
         }
 
@@ -1697,6 +1721,7 @@
             document.getElementById('id_issueDate').textContent = new Date().toLocaleDateString('en-ZA');
 
             document.getElementById('id-output').style.display = 'block';
+            document.getElementById('id-download-btn').style.display = 'block';
             document.getElementById('id-output').scrollIntoView({ behavior: 'smooth' });
         }
 
@@ -1747,6 +1772,7 @@
             document.getElementById('pp_mrz').textContent = mrzString;
 
             document.getElementById('passport-output').style.display = 'block';
+            document.getElementById('passport-download-btn').style.display = 'block';
             document.getElementById('passport-output').scrollIntoView({ behavior: 'smooth' });
         }
 
@@ -1792,6 +1818,7 @@
             document.getElementById('as_cardPhoto').src = asylumPhotoData;
 
             document.getElementById('asylum-output').style.display = 'block';
+            document.getElementById('asylum-download-btn').style.display = 'block';
             document.getElementById('asylum-output').scrollIntoView({ behavior: 'smooth' });
         }
 
