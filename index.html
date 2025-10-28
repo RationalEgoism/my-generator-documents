@@ -723,7 +723,7 @@
 <body>
     <div class="container">
         <h1>🇿🇦 South African Document Generator</h1>
-        <div class="version">Version 1.0.6</div>
+        <div class="version">Version 1.1.0</div>
 
         <div class="tabs">
             <button class="tab active" onclick="switchTab('id')">ID Card</button>
@@ -734,24 +734,24 @@
         <!-- ID CARD FORM -->
         <div id="id-form" class="form-content active">
             <div class="form-section">
-                <p>IMPORTANT: We can only register 9901160965083, so we can't change birthday, citizenship, sex, surname, names. Before registering a user with an SA ID, please to remove the user from olympus admin panel</p>
+                <p>IMPORTANT: Use "Fast Registration" for quick setup with VUMA THULISILE (Female, DOB: 1999-01-16) or "Generate custom data" for random data. ID number is auto-generated based on birth date and gender. Before registering a user with an SA ID, please remove the user from olympus admin panel.</p>
             </div>
             <div class="form-section">
                 <div class="form-group">
                     <label for="id_idNumber">Identity Number</label>
-                    <input type="text" id="id_idNumber" value="9901160965083" placeholder="9901160965083" maxlength="13" disabled>
+                    <input type="text" id="id_idNumber" value="" placeholder="9901160965083" maxlength="13" readonly>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="id_surname">First name</label>
-                    <input type="text" value="VUMA" id="id_surname" placeholder="VUMA" disabled>
+                    <input type="text" value="" id="id_surname" placeholder="VUMA" readonly>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="id_names">Last name</label>
-                    <input type="text" value="THULISILE" id="id_names" placeholder="THULISILE" disabled>
+                    <input type="text" value="" id="id_names" placeholder="THULISILE" readonly>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="id_sex">Sex</label>
                     <select id="id_sex" disabled>
@@ -759,10 +759,10 @@
                         <option value="M">Male</option>
                     </select>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="id_dateOfBirth">Date of Birth</label>
-                    <input type="date" value="1999-01-16" id="id_dateOfBirth" disabled>
+                    <input type="date" value="" id="id_dateOfBirth" readonly>
                 </div>
                 
                 <div class="form-group">
@@ -777,13 +777,14 @@
                 
                 <div class="form-group">
                     <label for="id_status">Status</label>
-                    <select id="id_status" disabled>
+                    <select id="id_status">
                         <option value="Citizen">Citizen</option>
                         <option value="Permanent Resident">Permanent Resident</option>
                     </select>
                 </div>
 
                 <div class="generate-custom-data">
+                    <button class="generate-custom-data-btn" onclick="generateSAIDFastRegistration()">Fast Registration</button>
                     <button class="generate-custom-data-btn" onclick="generateSAIDCustomData()">Generate custom data</button>
                 </div>
                 
@@ -1480,6 +1481,65 @@
             return result;
         }
 
+        // Luhn algorithm for checksum calculation
+        function calculateLuhnChecksum(idWithoutChecksum) {
+            const digits = idWithoutChecksum.split('').map(Number);
+            let sum = 0;
+
+            // Process from right to left, doubling every second digit
+            for (let i = digits.length - 1; i >= 0; i--) {
+                let digit = digits[i];
+
+                // Double every second digit (from right, so odd positions in reversed array)
+                if ((digits.length - 1 - i) % 2 === 0) {
+                    digit *= 2;
+                    if (digit > 9) {
+                        digit -= 9; // Equivalent to adding the digits (e.g., 16 -> 1+6=7)
+                    }
+                }
+
+                sum += digit;
+            }
+
+            // The checksum digit is what we need to add to make sum divisible by 10
+            const checksum = (10 - (sum % 10)) % 10;
+            return checksum;
+        }
+
+        // Generate South African ID Number following YYMMDDGSSSCAZ format
+        function generateSAIDNumber(dateOfBirth, gender, citizenship = '0') {
+            // Parse date of birth
+            const dob = new Date(dateOfBirth);
+            const yy = dob.getFullYear().toString().slice(-2); // Last 2 digits of year
+            const mm = String(dob.getMonth() + 1).padStart(2, '0');
+            const dd = String(dob.getDate()).padStart(2, '0');
+
+            // YYMMDD
+            let idNumber = yy + mm + dd;
+
+            // GSSS - Gender sequence number
+            // Female: 0000-4999, Male: 5000-9999
+            let sequenceNumber;
+            if (gender === 'F') {
+                sequenceNumber = Math.floor(Math.random() * 5000); // 0-4999
+            } else {
+                sequenceNumber = Math.floor(Math.random() * 5000) + 5000; // 5000-9999
+            }
+            idNumber += String(sequenceNumber).padStart(4, '0');
+
+            // C - Citizenship (0 = SA citizen, 1 = permanent resident)
+            idNumber += citizenship;
+
+            // A - Usually 8 (formerly race, now typically 8)
+            idNumber += '8';
+
+            // Z - Checksum using Luhn algorithm
+            const checksum = calculateLuhnChecksum(idNumber);
+            idNumber += checksum;
+
+            return idNumber;
+        }
+
         function calculateCheckDigit(data) {
             const weights = [7, 3, 1];
             let sum = 0;
@@ -1540,6 +1600,36 @@
             line2 += calculateCheckDigit(compositeData); // Final check digit for line 2
 
             return line1 + '\n' + line2;
+        }
+
+        async function generateSAIDFastRegistration() {
+            // Pre-filled data for fast registration
+            const surname = 'VUMA';
+            const names = 'THULISILE';
+            const gender = 'F';
+            const dateOfBirth = '1999-01-16';
+            const countryOfBirth = 'RSA';
+            const status = 'Citizen';
+            const nationality = 'RSA';
+
+            // Generate valid SA ID number
+            const idNumber = generateSAIDNumber(dateOfBirth, gender, '0'); // 0 = citizen
+
+            // Fill form fields
+            document.getElementById('id_idNumber').value = idNumber;
+            document.getElementById('id_surname').value = surname;
+            document.getElementById('id_names').value = names;
+            document.getElementById('id_sex').value = gender;
+            document.getElementById('id_dateOfBirth').value = dateOfBirth;
+            document.getElementById('id_nationality').value = nationality;
+            document.getElementById('id_countryOfBirth').value = countryOfBirth;
+            document.getElementById('id_status').value = status;
+
+            // Load photo
+            await fillPhoto(gender, 'id_preview');
+
+            // Show generate button
+            document.getElementById('id-generate-btn').style.display = 'block';
         }
 
         async function generateSAIDCustomData() {
