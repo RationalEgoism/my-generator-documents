@@ -719,7 +719,7 @@
 <body>
     <div class="container">
         <h1>🇿🇦 South African Document Generator</h1>
-        <div class="version">Version 1.0.3</div>
+        <div class="version">Version 1.0.4</div>
 
         <div class="tabs">
             <button class="tab active" onclick="switchTab('id')">ID Card</button>
@@ -1818,39 +1818,68 @@
         }
 
         function captureAndDownload(element, filename) {
+            // Get the original element's class to determine document type and size
+            let targetWidth, targetHeight;
+
+            if (element.classList.contains('id-card')) {
+                targetWidth = 856;
+                targetHeight = 540;
+            } else if (element.classList.contains('passport')) {
+                targetWidth = 1000;
+                targetHeight = 1400;
+            } else if (element.classList.contains('asylum-paper')) {
+                targetWidth = 800;
+                targetHeight = 'auto'; // Will calculate based on content
+            }
+
             // Clone the element
             const clone = element.cloneNode(true);
 
             // Create a temporary container positioned off-screen
             const tempContainer = document.createElement('div');
-            tempContainer.style.position = 'absolute';
-            tempContainer.style.left = '-9999px';
-            tempContainer.style.top = '0';
-            tempContainer.style.width = 'auto';
-            tempContainer.style.height = 'auto';
-            tempContainer.style.overflow = 'visible';
+            tempContainer.style.cssText = `
+                position: fixed;
+                left: -99999px;
+                top: 0;
+                width: ${targetWidth}px;
+                overflow: visible;
+                z-index: -1;
+            `;
 
-            // Reset all transforms on clone to get full size
-            clone.style.transform = 'none';
-            clone.style.transformOrigin = 'initial';
-            clone.style.width = element.scrollWidth ? element.scrollWidth + 'px' : 'auto';
-            clone.style.height = element.scrollHeight ? element.scrollHeight + 'px' : 'auto';
-            clone.style.maxWidth = 'none';
-            clone.style.maxHeight = 'none';
-            clone.style.margin = '0';
+            // Force clone to full size with NO transforms
+            clone.style.cssText = `
+                transform: none !important;
+                transform-origin: initial !important;
+                width: ${targetWidth}px !important;
+                height: ${targetHeight === 'auto' ? 'auto' : targetHeight + 'px'} !important;
+                max-width: none !important;
+                max-height: none !important;
+                min-width: ${targetWidth}px !important;
+                min-height: ${targetHeight === 'auto' ? 'auto' : targetHeight + 'px'} !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                position: relative !important;
+                display: block !important;
+            `;
 
             // Append to temp container and then to body
             tempContainer.appendChild(clone);
             document.body.appendChild(tempContainer);
 
-            // Small delay to ensure rendering
+            // Wait for rendering and fonts to load
             setTimeout(function() {
+                const actualHeight = targetHeight === 'auto' ? clone.offsetHeight : targetHeight;
+
                 html2canvas(clone, {
                     scale: 3,
                     useCORS: true,
                     allowTaint: true,
                     backgroundColor: null,
-                    logging: false
+                    logging: false,
+                    width: targetWidth,
+                    height: actualHeight,
+                    windowWidth: targetWidth,
+                    windowHeight: actualHeight
                 }).then(function(canvas) {
                     // Remove temp container
                     document.body.removeChild(tempContainer);
@@ -1875,7 +1904,7 @@
                     console.error('Error capturing document:', error);
                     alert('Ошибка при создании изображения. Попробуйте еще раз.');
                 });
-            }, 100);
+            }, 300);
         }
     </script>
 </body>
