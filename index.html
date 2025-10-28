@@ -203,6 +203,8 @@
         .document-container {
             margin-top: 40px;
             display: none;
+            overflow-x: auto;
+            width: 100%;
         }
 
         /* ID CARD STYLES */
@@ -601,21 +603,84 @@
         }
 
         @media (max-width: 900px) {
-            .id-card, .passport, .asylum-paper {
-                transform: scale(0.8);
-                transform-origin: top center;
+            .id-card {
+                width: 100%;
+                max-width: 856px;
+                height: auto;
+                min-height: 540px;
+            }
+
+            .passport {
+                width: 100%;
+                max-width: 1000px;
+                height: auto;
+                min-height: 1400px;
+            }
+
+            .asylum-paper {
+                width: 100%;
+                max-width: 800px;
             }
         }
 
         @media (max-width: 700px) {
-            .id-card, .passport, .asylum-paper {
-                transform: scale(0.6);
+            .id-card {
+                transform: scale(0.9);
+                transform-origin: top center;
+            }
+
+            .passport {
+                transform: scale(0.7);
+                transform-origin: top center;
+            }
+
+            .asylum-paper {
+                transform: scale(0.85);
+                transform-origin: top center;
+            }
+
+            .container {
+                padding: 15px;
             }
         }
 
         @media (max-width: 550px) {
-            .id-card, .passport, .asylum-paper {
-                transform: scale(0.45);
+            .id-card {
+                transform: scale(0.7);
+                transform-origin: top center;
+            }
+
+            .passport {
+                transform: scale(0.5);
+                transform-origin: top center;
+            }
+
+            .asylum-paper {
+                transform: scale(0.65);
+                transform-origin: top center;
+            }
+
+            .download-btn {
+                width: 90%;
+                font-size: 16px;
+                padding: 12px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .id-card {
+                transform: scale(0.55);
+                transform-origin: top center;
+            }
+
+            .passport {
+                transform: scale(0.35);
+                transform-origin: top center;
+            }
+
+            .asylum-paper {
+                transform: scale(0.5);
+                transform-origin: top center;
             }
         }
     </style>
