@@ -727,7 +727,7 @@
 <body>
     <div class="container">
         <h1>🇿🇦 South African Document Generator</h1>
-        <div class="version">Version 1.1.1</div>
+        <div class="version">Version 1.2.0</div>
 
         <div class="tabs">
             <button class="tab active" onclick="switchTab('id')">ID Card</button>
@@ -869,6 +869,7 @@
                 </div>
 
                 <div class="generate-custom-data">
+                    <button class="generate-custom-data-btn" onclick="generatePassportFastRegistration()">Fast Registration</button>
                     <button class="generate-custom-data-btn" onclick="generatePassportCustomData()">Generate custom data</button>
                 </div>
                 
@@ -1645,6 +1646,51 @@
 
             // Show generate button
             document.getElementById('id-generate-btn').style.display = 'block';
+        }
+
+        async function generatePassportFastRegistration() {
+            // Pre-filled data matching SA ID Fast Registration
+            const surname = 'VUMA';
+            const names = 'THULISILE';
+            const gender = 'F';
+            const dateOfBirth = '1999-01-16';
+            const nationality = 'SOUTH AFRICAN';
+            const pob_code = 'ZAF';
+            const authority = 'DEPT OF HOME AFFAIRS';
+            const countryCode = 'ZAF';
+
+            // Generate SA ID number
+            const identityNo = generateSAIDNumber(dateOfBirth, gender, '0');
+
+            // Generate passport number (M + 8 random digits)
+            const number = 'M' + Math.floor(Math.random() * 100000000).toString().padStart(8, '0');
+
+            // Generate dates
+            const today = new Date();
+            const issueDate = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
+            const expiryDate = new Date(today.getFullYear() + 9, today.getMonth(), today.getDate());
+
+            const issue = issueDate.toISOString().split('T')[0];
+            const expiry = expiryDate.toISOString().split('T')[0];
+
+            // Fill form
+            document.getElementById('pp_number').value = number;
+            document.getElementById('pp_identity_no').value = identityNo;
+            document.getElementById('pp_surname').value = surname;
+            document.getElementById('pp_names').value = names;
+            document.getElementById('pp_nationality').value = nationality;
+            document.getElementById('pp_dob').value = dateOfBirth;
+            document.getElementById('pp_pob_code').value = pob_code;
+            document.getElementById('pp_sex').value = gender;
+            document.getElementById('pp_issue').value = issue;
+            document.getElementById('pp_expiry').value = expiry;
+            document.getElementById('pp_authority').value = authority;
+            document.getElementById('pp_country_code').value = countryCode;
+
+            await fillPhoto(gender, 'pp_preview');
+
+            // Show generate button
+            document.getElementById('passport-generate-btn').style.display = 'block';
         }
 
         async function generatePassportCustomData() {
