@@ -154,6 +154,39 @@
             background: #5568d3;
         }
 
+        .copy-btn {
+            background: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: background 0.3s;
+            margin-left: 10px;
+            white-space: nowrap;
+        }
+
+        .copy-btn:hover {
+            background: #218838;
+        }
+
+        .copy-btn:active {
+            background: #1e7e34;
+            transform: scale(0.98);
+        }
+
+        .form-group-with-copy {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group-with-copy input {
+            flex: 1;
+        }
+
         .upload-btn {
             background: #667eea;
             color: white;
@@ -731,7 +764,7 @@
 <body>
     <div class="container">
         <h1>🇿🇦 South African Document Generator</h1>
-        <div class="version">Version 1.2.2</div>
+        <div class="version">Version 1.3.0</div>
 
         <div class="tabs">
             <button class="tab active" onclick="switchTab('id')">ID Card</button>
@@ -747,7 +780,10 @@
             <div class="form-section">
                 <div class="form-group">
                     <label for="id_idNumber">Identity Number</label>
-                    <input type="text" id="id_idNumber" value="" placeholder="9901160965083" maxlength="13" readonly>
+                    <div class="form-group-with-copy">
+                        <input type="text" id="id_idNumber" value="" placeholder="9901160965083" maxlength="13" readonly>
+                        <button class="copy-btn" onclick="copyToClipboard('id_idNumber')">Copy</button>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -811,12 +847,18 @@
             <div class="form-section">
                 <div class="form-group">
                     <label for="pp_number">Passport Number</label>
-                    <input type="text" id="pp_number" placeholder="M00000000" maxlength="9">
+                    <div class="form-group-with-copy">
+                        <input type="text" id="pp_number" placeholder="M00000000" maxlength="9">
+                        <button class="copy-btn" onclick="copyToClipboard('pp_number')">Copy</button>
+                    </div>
                 </div>
 
                 <div class="form-group">
                     <label for="pp_identity_no">Identity No</label>
-                    <input type="text" id="pp_identity_no" placeholder="8001014999082" maxlength="9">
+                    <div class="form-group-with-copy">
+                        <input type="text" id="pp_identity_no" placeholder="8001014999082" maxlength="9">
+                        <button class="copy-btn" onclick="copyToClipboard('pp_identity_no')">Copy</button>
+                    </div>
                 </div>
                 
                 <div class="form-group">
@@ -892,7 +934,10 @@
             <div class="form-section">
                 <div class="form-group">
                     <label for="as_refNumber">Reference Number</label>
-                    <input type="text" id="as_refNumber" placeholder="ASY/2024/00000">
+                    <div class="form-group-with-copy">
+                        <input type="text" id="as_refNumber" placeholder="ASY/2024/00000">
+                        <button class="copy-btn" onclick="copyToClipboard('as_refNumber')">Copy</button>
+                    </div>
                 </div>
                 
                 <div class="form-group">
@@ -1357,6 +1402,80 @@
 
         function getRandomItem(arr) {
             return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        // Copy to clipboard function
+        function copyToClipboard(inputId) {
+            const input = document.getElementById(inputId);
+            const value = input.value;
+
+            if (!value) {
+                alert('No value to copy');
+                return;
+            }
+
+            // Modern approach using Clipboard API
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(value).then(function() {
+                    // Show success feedback
+                    const button = event.target;
+                    const originalText = button.textContent;
+                    button.textContent = 'Copied!';
+                    button.style.background = '#1e7e34';
+
+                    setTimeout(function() {
+                        button.textContent = originalText;
+                        button.style.background = '#28a745';
+                    }, 2000);
+                }).catch(function(err) {
+                    console.error('Failed to copy: ', err);
+                    fallbackCopyTextToClipboard(value);
+                });
+            } else {
+                // Fallback for older browsers
+                fallbackCopyTextToClipboard(value);
+            }
+        }
+
+        // Fallback copy function for older browsers
+        function fallbackCopyTextToClipboard(text) {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.top = '0';
+            textArea.style.left = '0';
+            textArea.style.width = '2em';
+            textArea.style.height = '2em';
+            textArea.style.padding = '0';
+            textArea.style.border = 'none';
+            textArea.style.outline = 'none';
+            textArea.style.boxShadow = 'none';
+            textArea.style.background = 'transparent';
+
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    const button = event.target;
+                    const originalText = button.textContent;
+                    button.textContent = 'Copied!';
+                    button.style.background = '#1e7e34';
+
+                    setTimeout(function() {
+                        button.textContent = originalText;
+                        button.style.background = '#28a745';
+                    }, 2000);
+                } else {
+                    alert('Failed to copy');
+                }
+            } catch (err) {
+                alert('Failed to copy: ' + err);
+            }
+
+            document.body.removeChild(textArea);
         }
 
         function generateNameByGender(gender) {
