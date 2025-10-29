@@ -764,12 +764,12 @@
 <body>
     <div class="container">
         <h1>🇿🇦 South African Document Generator</h1>
-        <div class="version">Version 1.6.1</div>
+        <div class="version">Version 1.7.0</div>
 
         <div class="tabs">
-            <button class="tab active" onclick="switchTab('id')">ID Card</button>
-            <button class="tab" onclick="switchTab('passport')">Passport</button>
-            <button class="tab" onclick="switchTab('asylum')">Asylum Paper</button>
+            <button class="tab active" onclick="switchTab('id'); window.location.hash = 'id';">ID Card</button>
+            <button class="tab" onclick="switchTab('passport'); window.location.hash = 'passport';">Passport</button>
+            <button class="tab" onclick="switchTab('asylum'); window.location.hash = 'asylum';">Asylum Paper</button>
         </div>
 
         <!-- ID CARD FORM -->
@@ -1989,6 +1989,15 @@
                 }
             }
         }
+
+        // Open specific tab from URL hash on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            const hash = window.location.hash.substring(1); // Remove the # symbol
+            if (hash === 'passport' || hash === 'asylum') {
+                switchTab(hash);
+            }
+            // Default is 'id' tab which is already active
+        });
 
         // Photo uploads
         document.getElementById('id_photo').addEventListener('change', function(e) {
