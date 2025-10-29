@@ -764,7 +764,7 @@
 <body>
     <div class="container">
         <h1>🇿🇦 South African Document Generator</h1>
-        <div class="version">Version 1.6.0</div>
+        <div class="version">Version 1.6.1</div>
 
         <div class="tabs">
             <button class="tab active" onclick="switchTab('id')">ID Card</button>
@@ -1584,7 +1584,9 @@
 
         async function fillPhoto(gender, identifier, saveFileName = false) {
             const photoFiles = gender === 'M' ? photoMaleFiles : photoFemaleFiles;
-            const photoFile = getRandomItem(photoFiles);
+
+            // For Fast Registration, always use the first photo (face_01.png for female)
+            const photoFile = saveFileName ? photoFiles[0] : getRandomItem(photoFiles);
 
             // Save the filename for Fast Registration
             if (saveFileName) {
