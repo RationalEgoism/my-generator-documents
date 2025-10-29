@@ -764,7 +764,7 @@
 <body>
     <div class="container">
         <h1>🇿🇦 South African Document Generator</h1>
-        <div class="version">Version 1.5.1</div>
+        <div class="version">Version 1.5.2</div>
 
         <div class="tabs">
             <button class="tab active" onclick="switchTab('id')">ID Card</button>
@@ -1020,7 +1020,7 @@
         <!-- ID CARD OUTPUT -->
         <div id="id-output" class="document-container">
             <button class="download-btn" id="id-download-btn" style="display: none;" onclick="downloadDocument('id-card', 'SA_ID_Card')">Скачать ID Card</button>
-            <button class="download-btn" id="id-photo-download-btn" style="display: none;" onclick="downloadDocument('id-card', 'SA_ID_Card_For_Registration')">Скачать для регистрации</button>
+            <button class="download-btn" id="id-photo-download-btn" style="display: none;" onclick="downloadFacePhoto('id')">Скачать фото лица</button>
             <div class="id-card" id="id-card">
                 <div class="id-card-header">
                     <div class="coat-of-arms">SA Coat of Arms</div>
@@ -1090,7 +1090,7 @@
         <!-- PASSPORT OUTPUT -->
         <div id="passport-output" class="document-container">
             <button class="download-btn" id="passport-download-btn" style="display: none;" onclick="downloadDocument('passport', 'SA_Passport')">Скачать Passport</button>
-            <button class="download-btn" id="passport-photo-download-btn" style="display: none;" onclick="downloadDocument('passport', 'SA_Passport_For_Registration')">Скачать для регистрации</button>
+            <button class="download-btn" id="passport-photo-download-btn" style="display: none;" onclick="downloadFacePhoto('passport')">Скачать фото лица</button>
             <div class="passport" id="passport">
                 <div class="passport-cover">
                     <div class="passport-coat">SA Coat of Arms</div>
@@ -1195,7 +1195,7 @@
         <!-- ASYLUM PAPER OUTPUT -->
         <div id="asylum-output" class="document-container">
             <button class="download-btn" id="asylum-download-btn" style="display: none;" onclick="downloadDocument('asylum-paper', 'SA_Asylum_Paper')">Скачать Asylum Paper</button>
-            <button class="download-btn" id="asylum-photo-download-btn" style="display: none;" onclick="downloadDocument('asylum-paper', 'SA_Asylum_For_Registration')">Скачать для регистрации</button>
+            <button class="download-btn" id="asylum-photo-download-btn" style="display: none;" onclick="downloadFacePhoto('asylum')">Скачать фото лица</button>
             <div class="asylum-paper" id="asylum-paper">
                 <div class="asylum-header">
                     <div class="asylum-logo">REPUBLIC OF SOUTH AFRICA</div>
@@ -1316,6 +1316,9 @@
         let idPhotoData = null;
         let passportPhotoData = null;
         let asylumPhotoData = null;
+
+        // Store which face file was used for Fast Registration
+        let currentFaceFile = null;
 
         const photoFemaleFiles = ['face_01.png', 'face_02.png', 'face_03.png'];
         const photoMaleFiles = ['face_04.png', 'face_05.png', 'face_06.png', 'face_07.png'];
@@ -1578,9 +1581,15 @@
             return parts.join(', ');
         }
 
-        async function fillPhoto(gender, identifier) {
+        async function fillPhoto(gender, identifier, saveFileName = false) {
             const photoFiles = gender === 'M' ? photoMaleFiles : photoFemaleFiles;
             const photoFile = getRandomItem(photoFiles);
+
+            // Save the filename for Fast Registration
+            if (saveFileName) {
+                currentFaceFile = photoFile;
+            }
+
             const blob = await fetch(photoFile).then(res => res.blob());
             const reader = new FileReader();
             reader.onload = function(event) {
@@ -1754,8 +1763,8 @@
             document.getElementById('id_countryOfBirth').value = countryOfBirth;
             document.getElementById('id_status').value = status;
 
-            // Load photo
-            await fillPhoto(gender, 'id_preview');
+            // Load photo and save filename
+            await fillPhoto(gender, 'id_preview', true);
 
             // Show copy button
             document.getElementById('id_copy_btn').style.display = 'block';
@@ -1817,7 +1826,7 @@
             document.getElementById('pp_authority').value = authority;
             document.getElementById('pp_country_code').value = countryCode;
 
-            await fillPhoto(gender, 'pp_preview');
+            await fillPhoto(gender, 'pp_preview', true);
 
             // Show copy buttons
             document.getElementById('pp_number_copy_btn').style.display = 'block';
@@ -2119,6 +2128,38 @@
             }
 
             document.getElementById('asylum-output').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Download face photo file
+        async function downloadFacePhoto(docType) {
+            if (!currentFaceFile) {
+                alert('Файл фотографии не найден. Используйте Fast Registration.');
+                return;
+            }
+
+            try {
+                // Fetch the original face file
+                const response = await fetch(currentFaceFile);
+                const blob = await response.blob();
+
+                // Generate unique filename with timestamp
+                const timestamp = new Date().getTime();
+                const fileExtension = currentFaceFile.split('.').pop();
+                const uniqueFilename = `Face_Photo_${docType}_${timestamp}.${fileExtension}`;
+
+                // Create download link
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = uniqueFilename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Error downloading face photo:', error);
+                alert('Ошибка при скачивании фотографии');
+            }
         }
 
         // Download document as image
