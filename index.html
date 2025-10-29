@@ -764,7 +764,7 @@
 <body>
     <div class="container">
         <h1>🇿🇦 South African Document Generator</h1>
-        <div class="version">Version 1.3.3</div>
+        <div class="version">Version 1.4.0</div>
 
         <div class="tabs">
             <button class="tab active" onclick="switchTab('id')">ID Card</button>
@@ -782,7 +782,7 @@
                     <label for="id_idNumber">Identity Number</label>
                     <div class="form-group-with-copy">
                         <input type="text" id="id_idNumber" value="" placeholder="9901160965083" maxlength="13" readonly>
-                        <button class="copy-btn" onclick="copyToClipboard('id_idNumber', this)">Copy</button>
+                        <button class="copy-btn" id="id_copy_btn" style="display: none;" onclick="copyToClipboard('id_idNumber', this)">Copy</button>
                     </div>
                 </div>
 
@@ -849,7 +849,7 @@
                     <label for="pp_number">Passport Number</label>
                     <div class="form-group-with-copy">
                         <input type="text" id="pp_number" placeholder="M00000000" maxlength="9">
-                        <button class="copy-btn" onclick="copyToClipboard('pp_number', this)">Copy</button>
+                        <button class="copy-btn" id="pp_number_copy_btn" style="display: none;" onclick="copyToClipboard('pp_number', this)">Copy</button>
                     </div>
                 </div>
 
@@ -857,7 +857,7 @@
                     <label for="pp_identity_no">Identity No</label>
                     <div class="form-group-with-copy">
                         <input type="text" id="pp_identity_no" placeholder="8001014999082" maxlength="9">
-                        <button class="copy-btn" onclick="copyToClipboard('pp_identity_no', this)">Copy</button>
+                        <button class="copy-btn" id="pp_identity_copy_btn" style="display: none;" onclick="copyToClipboard('pp_identity_no', this)">Copy</button>
                     </div>
                 </div>
                 
@@ -936,7 +936,7 @@
                     <label for="as_refNumber">Reference Number</label>
                     <div class="form-group-with-copy">
                         <input type="text" id="as_refNumber" placeholder="ASY/2024/00000">
-                        <button class="copy-btn" onclick="copyToClipboard('as_refNumber', this)">Copy</button>
+                        <button class="copy-btn" id="as_copy_btn" style="display: none;" onclick="copyToClipboard('as_refNumber', this)">Copy</button>
                     </div>
                 </div>
                 
@@ -1754,6 +1754,9 @@
             // Load photo
             await fillPhoto(gender, 'id_preview');
 
+            // Show copy button
+            document.getElementById('id_copy_btn').style.display = 'block';
+
             // Show generate button
             document.getElementById('id-generate-btn').style.display = 'block';
         }
@@ -1764,6 +1767,9 @@
             fillPhoto(gender, 'id_preview');
             document.getElementById('id_nationality').value = getRandomItem(nationalities);
             document.getElementById('id_countryOfBirth').value = getRandomItem(countries).iso3;
+
+            // Show copy button
+            document.getElementById('id_copy_btn').style.display = 'block';
 
             // Show generate button
             document.getElementById('id-generate-btn').style.display = 'block';
@@ -1810,6 +1816,10 @@
 
             await fillPhoto(gender, 'pp_preview');
 
+            // Show copy buttons
+            document.getElementById('pp_number_copy_btn').style.display = 'block';
+            document.getElementById('pp_identity_copy_btn').style.display = 'block';
+
             // Show generate button
             document.getElementById('passport-generate-btn').style.display = 'block';
         }
@@ -1843,6 +1853,10 @@
 
             fillPhoto(gender, 'pp_preview');
 
+            // Show copy buttons
+            document.getElementById('pp_number_copy_btn').style.display = 'block';
+            document.getElementById('pp_identity_copy_btn').style.display = 'block';
+
             // Show generate button
             document.getElementById('passport-generate-btn').style.display = 'block';
         }
@@ -1865,6 +1879,9 @@
             document.getElementById('as_validUntil').value = generateFutureDay(1, 5);
 
             fillPhoto(gender, 'as_preview');
+
+            // Show copy button
+            document.getElementById('as_copy_btn').style.display = 'block';
 
             // Show generate button
             document.getElementById('asylum-generate-btn').style.display = 'block';
