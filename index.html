@@ -764,7 +764,7 @@
 <body>
     <div class="container">
         <h1>🇿🇦 South African Document Generator</h1>
-        <div class="version">Version 1.5.0</div>
+        <div class="version">Version 1.5.1</div>
 
         <div class="tabs">
             <button class="tab active" onclick="switchTab('id')">ID Card</button>
@@ -1020,7 +1020,7 @@
         <!-- ID CARD OUTPUT -->
         <div id="id-output" class="document-container">
             <button class="download-btn" id="id-download-btn" style="display: none;" onclick="downloadDocument('id-card', 'SA_ID_Card')">Скачать ID Card</button>
-            <button class="download-btn" id="id-photo-download-btn" style="display: none;" onclick="downloadPhoto('id_cardPhoto', 'SA_ID_Photo')">Скачать фото</button>
+            <button class="download-btn" id="id-photo-download-btn" style="display: none;" onclick="downloadDocument('id-card', 'SA_ID_Card_For_Registration')">Скачать для регистрации</button>
             <div class="id-card" id="id-card">
                 <div class="id-card-header">
                     <div class="coat-of-arms">SA Coat of Arms</div>
@@ -1090,7 +1090,7 @@
         <!-- PASSPORT OUTPUT -->
         <div id="passport-output" class="document-container">
             <button class="download-btn" id="passport-download-btn" style="display: none;" onclick="downloadDocument('passport', 'SA_Passport')">Скачать Passport</button>
-            <button class="download-btn" id="passport-photo-download-btn" style="display: none;" onclick="downloadPhoto('pp_cardPhoto', 'SA_Passport_Photo')">Скачать фото</button>
+            <button class="download-btn" id="passport-photo-download-btn" style="display: none;" onclick="downloadDocument('passport', 'SA_Passport_For_Registration')">Скачать для регистрации</button>
             <div class="passport" id="passport">
                 <div class="passport-cover">
                     <div class="passport-coat">SA Coat of Arms</div>
@@ -1195,7 +1195,7 @@
         <!-- ASYLUM PAPER OUTPUT -->
         <div id="asylum-output" class="document-container">
             <button class="download-btn" id="asylum-download-btn" style="display: none;" onclick="downloadDocument('asylum-paper', 'SA_Asylum_Paper')">Скачать Asylum Paper</button>
-            <button class="download-btn" id="asylum-photo-download-btn" style="display: none;" onclick="downloadPhoto('as_cardPhoto', 'SA_Asylum_Photo')">Скачать фото</button>
+            <button class="download-btn" id="asylum-photo-download-btn" style="display: none;" onclick="downloadDocument('asylum-paper', 'SA_Asylum_For_Registration')">Скачать для регистрации</button>
             <div class="asylum-paper" id="asylum-paper">
                 <div class="asylum-header">
                     <div class="asylum-logo">REPUBLIC OF SOUTH AFRICA</div>
@@ -2119,28 +2119,6 @@
             }
 
             document.getElementById('asylum-output').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // Download photo from document
-        function downloadPhoto(imgElementId, filename) {
-            const img = document.getElementById(imgElementId);
-
-            if (!img || !img.src) {
-                alert('Фото не найдено');
-                return;
-            }
-
-            // Generate unique filename with timestamp
-            const timestamp = new Date().getTime();
-            const uniqueFilename = `${filename}_${timestamp}.png`;
-
-            // Create a temporary link to download the image
-            const link = document.createElement('a');
-            link.href = img.src;
-            link.download = uniqueFilename;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
         }
 
         // Download document as image
