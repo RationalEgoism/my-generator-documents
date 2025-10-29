@@ -764,7 +764,7 @@
 <body>
     <div class="container">
         <h1>🇿🇦 South African Document Generator</h1>
-        <div class="version">Version 1.5.3</div>
+        <div class="version">Version 1.6.0</div>
 
         <div class="tabs">
             <button class="tab active" onclick="switchTab('id')">ID Card</button>
@@ -1004,6 +1004,7 @@
                 </div>
 
                 <div class="generate-custom-data">
+                    <button class="generate-custom-data-btn" onclick="generateAsylumFastRegistration()">Fast Registration</button>
                     <button class="generate-custom-data-btn" onclick="generateAsylumCustomData()">Generate custom data</button>
                 </div>
                 
@@ -1871,6 +1872,57 @@
 
             // Show generate button
             document.getElementById('passport-generate-btn').style.display = 'block';
+        }
+
+        async function generateAsylumFastRegistration() {
+            // Pre-filled data matching SA ID Fast Registration
+            const surname = 'VUMA';
+            const names = 'THULISILE';
+            const gender = 'F';
+            const dateOfBirth = '1999-01-16';
+            const nationality = 'SOUTH AFRICAN';
+            const placeOfBirth = 'South Africa';
+            const passportNo = 'M' + Math.floor(Math.random() * 100000000).toString().padStart(8, '0');
+
+            // Generate dates
+            const today = new Date();
+            const arrivalDate = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
+            const issueDate = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+            const validUntil = new Date(today.getFullYear(), today.getMonth() + 5, today.getDate());
+
+            const dateOfArrival = arrivalDate.toISOString().split('T')[0];
+            const issue = issueDate.toISOString().split('T')[0];
+            const valid = validUntil.toISOString().split('T')[0];
+
+            const portOfEntry = 'OR Tambo International Airport';
+            const address = '123 Main Street, Johannesburg, 2000';
+
+            // Generate random reference number (user will see and can change if needed)
+            const randomNumber = Math.floor(Math.random() * 100000).toString().padStart(5, '0');
+            const refNumber = `ASY2024${randomNumber}`;
+
+            // Fill form
+            document.getElementById('as_refNumber').value = refNumber;
+            document.getElementById('as_surname').value = surname;
+            document.getElementById('as_names').value = names;
+            document.getElementById('as_nationality').value = nationality;
+            document.getElementById('as_dob').value = dateOfBirth;
+            document.getElementById('as_pob').value = placeOfBirth;
+            document.getElementById('as_sex').value = gender;
+            document.getElementById('as_passportNo').value = passportNo;
+            document.getElementById('as_dateOfArrival').value = dateOfArrival;
+            document.getElementById('as_portOfEntry').value = portOfEntry;
+            document.getElementById('as_address').value = address;
+            document.getElementById('as_issueDate').value = issue;
+            document.getElementById('as_validUntil').value = valid;
+
+            await fillPhoto(gender, 'as_preview', true);
+
+            // Show copy button
+            document.getElementById('as_copy_btn').style.display = 'block';
+
+            // Show generate button
+            document.getElementById('asylum-generate-btn').style.display = 'block';
         }
 
         async function generateAsylumCustomData() {
