@@ -504,8 +504,6 @@
             background: white;
             margin: 0 auto;
             padding: 50px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            border: 2px solid #003d82;
         }
 
         .asylum-header {
@@ -759,7 +757,7 @@
 <body>
     <div class="container">
         <h1>🇿🇦 South African Document Generator</h1>
-        <div class="version">Version 1.8.0</div>
+        <div class="version">Version 1.8.1</div>
 
         <div class="tabs">
             <button class="tab active" onclick="switchTab('id'); window.location.hash = 'id';">ID Card</button>
@@ -1818,9 +1816,8 @@
 
             await fillPhoto(gender, 'pp_preview', true);
 
-            // Show copy buttons
+            // Show copy button for passport number only
             document.getElementById('pp_number_copy_btn').style.display = 'block';
-            document.getElementById('pp_identity_copy_btn').style.display = 'block';
 
             // Show generate button
             document.getElementById('passport-generate-btn').style.display = 'block';
