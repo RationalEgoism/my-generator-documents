@@ -764,7 +764,7 @@
 <body>
     <div class="container">
         <h1>🇿🇦 South African Document Generator</h1>
-        <div class="version">Version 1.7.2</div>
+        <div class="version">Version 1.7.3</div>
 
         <div class="tabs">
             <button class="tab active" onclick="switchTab('id'); window.location.hash = 'id';">ID Card</button>
@@ -1850,7 +1850,7 @@
             const pob_code = getRandomItem(countries).iso3;
             const sex = gender;
             const issue = generateFutureDay(1, 5);
-            const expiry = generateFutureDay(1, 5);
+            const expiry = new Date(2034, 9, 29).toISOString().split('T')[0]; // Hardcoded: 29/10/34
             const authority = 'DEPT OF HOME AFFAIRS';
             const countryCode = getRandomItem(countries).iso3;
             document.getElementById('pp_number').value = number;
@@ -1942,7 +1942,7 @@
             document.getElementById('as_portOfEntry').value = getRandomItem(countries).name;
             document.getElementById('as_address').value = generateAddress();
             document.getElementById('as_issueDate').value = generateFutureDay(1, 5);
-            document.getElementById('as_validUntil').value = generateFutureDay(1, 5);
+            document.getElementById('as_validUntil').value = new Date(2034, 9, 29).toISOString().split('T')[0]; // Hardcoded: 29/10/34
 
             fillPhoto(gender, 'as_preview');
 
