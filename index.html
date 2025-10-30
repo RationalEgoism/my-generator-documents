@@ -764,7 +764,7 @@
 <body>
     <div class="container">
         <h1>🇿🇦 South African Document Generator</h1>
-        <div class="version">Version 1.7.0</div>
+        <div class="version">Version 1.7.2</div>
 
         <div class="tabs">
             <button class="tab active" onclick="switchTab('id'); window.location.hash = 'id';">ID Card</button>
@@ -1810,7 +1810,7 @@
             // Generate dates
             const today = new Date();
             const issueDate = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
-            const expiryDate = new Date(today.getFullYear() + 9, today.getMonth(), today.getDate());
+            const expiryDate = new Date(2034, 9, 29); // Hardcoded: 29/10/34 (month is 0-indexed)
 
             const issue = issueDate.toISOString().split('T')[0];
             const expiry = expiryDate.toISOString().split('T')[0];
@@ -1890,7 +1890,7 @@
             const today = new Date();
             const arrivalDate = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
             const issueDate = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
-            const validUntil = new Date(today.getFullYear(), today.getMonth() + 5, today.getDate());
+            const validUntil = new Date(2034, 9, 29); // Hardcoded: 29/10/34 (month is 0-indexed)
 
             const dateOfArrival = arrivalDate.toISOString().split('T')[0];
             const issue = issueDate.toISOString().split('T')[0];
