@@ -764,7 +764,7 @@
 <body>
     <div class="container">
         <h1>🇿🇦 South African Document Generator</h1>
-        <div class="version">Version 1.7.3</div>
+        <div class="version">Version 1.7.4</div>
 
         <div class="tabs">
             <button class="tab active" onclick="switchTab('id'); window.location.hash = 'id';">ID Card</button>
@@ -1810,10 +1810,9 @@
             // Generate dates
             const today = new Date();
             const issueDate = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
-            const expiryDate = new Date(2034, 9, 29); // Hardcoded: 29/10/34 (month is 0-indexed)
 
             const issue = issueDate.toISOString().split('T')[0];
-            const expiry = expiryDate.toISOString().split('T')[0];
+            const expiry = '2034-10-29'; // Hardcoded: 29/10/34
 
             // Fill form
             document.getElementById('pp_number').value = number;
@@ -1850,7 +1849,7 @@
             const pob_code = getRandomItem(countries).iso3;
             const sex = gender;
             const issue = generateFutureDay(1, 5);
-            const expiry = new Date(2034, 9, 29).toISOString().split('T')[0]; // Hardcoded: 29/10/34
+            const expiry = '2034-10-29'; // Hardcoded: 29/10/34
             const authority = 'DEPT OF HOME AFFAIRS';
             const countryCode = getRandomItem(countries).iso3;
             document.getElementById('pp_number').value = number;
@@ -1890,11 +1889,10 @@
             const today = new Date();
             const arrivalDate = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
             const issueDate = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
-            const validUntil = new Date(2034, 9, 29); // Hardcoded: 29/10/34 (month is 0-indexed)
 
             const dateOfArrival = arrivalDate.toISOString().split('T')[0];
             const issue = issueDate.toISOString().split('T')[0];
-            const valid = validUntil.toISOString().split('T')[0];
+            const valid = '2034-10-29'; // Hardcoded: 29/10/34
 
             const portOfEntry = 'OR Tambo International Airport';
             const address = '123 Main Street, Johannesburg, 2000';
@@ -1942,7 +1940,7 @@
             document.getElementById('as_portOfEntry').value = getRandomItem(countries).name;
             document.getElementById('as_address').value = generateAddress();
             document.getElementById('as_issueDate').value = generateFutureDay(1, 5);
-            document.getElementById('as_validUntil').value = new Date(2034, 9, 29).toISOString().split('T')[0]; // Hardcoded: 29/10/34
+            document.getElementById('as_validUntil').value = '2034-10-29'; // Hardcoded: 29/10/34
 
             fillPhoto(gender, 'as_preview');
 
